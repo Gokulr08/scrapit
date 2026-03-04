@@ -1,0 +1,41 @@
+site: https://www.imdb.com/title/tt0111161/
+use: beautifulsoup
+
+scrape:
+  title:
+    - 'h1[data-testid="hero-title-block__title"]'
+    - attr: 'text'
+    - transform: [strip]
+
+  year:
+    - 'span.sc-8c396aa2-2'
+    - attr: 'text'
+    - transform: [strip]
+
+  rating:
+    - 'span.sc-bde20123-1'
+    - attr: 'text'
+    - transform: [strip]
+    - validate:
+        type: float
+
+  votes:
+    - 'div.sc-bde20123-3'
+    - attr: 'text'
+    - transform: [strip, {regex: '[\\d,]+'}]
+
+  genres:
+    - 'span.ipc-chip__text'
+    - attr: 'text'
+    - all: true
+    - transform: [strip]
+
+  director:
+    - 'a.ipc-metadata-list-item__list-content-item'
+    - attr: 'text'
+    - transform: [strip]
+
+  synopsis:
+    - 'span.sc-2d1a1d91-1'
+    - attr: 'text'
+    - transform: [strip]
