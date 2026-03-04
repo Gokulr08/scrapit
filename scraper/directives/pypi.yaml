@@ -1,0 +1,33 @@
+site: https://pypi.org/project/requests/
+use: beautifulsoup
+
+scrape:
+  name:
+    - 'h1.package-name'
+    - attr: 'text'
+    - transform: [strip]
+
+  version:
+    - 'span.package-header-version'
+    - attr: 'text'
+    - transform: [strip]
+
+  description:
+    - 'p.package-description__summary'
+    - attr: 'text'
+    - transform: [strip]
+
+  author:
+    - 'span.author-name'
+    - attr: 'text'
+    - transform: [strip]
+
+  license:
+    - 'span.sidebar-section_license'
+    - attr: 'text'
+    - transform: [strip]
+
+  homepage:
+    - 'a.third-party-project-link'
+    - attr: 'href'
+    - transform: [strip]
