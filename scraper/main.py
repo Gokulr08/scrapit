@@ -48,28 +48,30 @@ def _resolve(path_str: str) -> Path:
 
 # ── Storage dispatch ──────────────────────────────────────────────────────────
 
-def _save(result: dict | list, name: str, dest: str):
+def _save(result: dict | list, name: str, dest: str, *, output_dir: str | None = None):
     items = result if isinstance(result, list) else [result]
     for item in items:
         if dest == "mongo":
             mongo.save_scraped(item)
         elif dest == "csv":
-            csv_storage.save(item, name)
+            csv_storage.save(item, name, output_dir=output_dir)
         elif dest == "sqlite":
-            sqlite_storage.save(item, name)
+            sqlite_storage.save(item, name, output_dir=output_dir)
         else:
             # json: save list or single dict
             break
     if dest == "json":
-        out = json_file.save(result, name)
+        out = json_file.save(result, name, output_dir=output_dir)
         print(f"→ saved: {out}")
     elif dest == "mongo":
         print(f"→ saved {len(items)} record(s) in MongoDB.")
     elif dest == "csv":
-        out = _ROOT / "output" / f"{name}.csv"
+        base = Path(output_dir) if output_dir else _ROOT / "output"
+        out = base / f"{name}.csv"
         print(f"→ appended {len(items)} row(s) to: {out}")
     elif dest == "sqlite":
-        print(f"→ saved {len(items)} record(s) in SQLite ({_ROOT / 'output' / 'scrapit.db'})")
+        base = Path(output_dir) if output_dir else _ROOT / "output"
+        print(f"→ saved {len(items)} record(s) in SQLite ({base / 'scrapit.db'})")
 
 
 # ── Core run ──────────────────────────────────────────────────────────────────
@@ -78,6 +80,7 @@ def _run_one(
     directive_path: Path,
     dest: str,
     *,
+    output_dir: str | None = None,
     preview: bool = False,
     detect_changes: bool = False,
     notify_config: dict | None = None,
@@ -113,7 +116,7 @@ def _run_one(
                 print("→ no changes detected.")
 
     if not preview:
-        _save(result, name, dest)
+        _save(result, name, dest, output_dir=output_dir)
         from scraper import hooks
         hooks.fire("on_save", result, dest)
 
@@ -123,7 +126,8 @@ def _run_one(
 def cmd_scrape(args):
     path = _resolve(args.directive)
     dest = _dest(args)
-    _run_one(path, dest, preview=args.preview, detect_changes=args.diff)
+    output_dir = getattr(args, 'output_dir', None)
+    _run_one(path, dest, output_dir=output_dir, preview=args.preview, detect_changes=args.diff)
 
 
 def cmd_batch(args):
@@ -138,13 +142,14 @@ def cmd_batch(args):
         sys.exit(1)
 
     dest = _dest(args)
+    output_dir = getattr(args, 'output_dir', None)
     ok, failed = 0, 0
     for y in yamls:
         print(f"\n{'─' * 50}")
         print(f"  {y.name}")
         print(f"{'─' * 50}")
         try:
-            _run_one(y, dest, preview=args.preview, detect_changes=args.diff)
+            _run_one(y, dest, output_dir=output_dir, preview=args.preview, detect_changes=args.diff)
             ok += 1
         except Exception as e:
             log(f"batch: error in {y.name}: {e}", "error")
@@ -247,6 +252,7 @@ def _add_output_args(p):
     group.add_argument("--mongo", action="store_true", help="Save to MongoDB")
     group.add_argument("--csv", action="store_true", help="Append to output/<name>.csv")
     group.add_argument("--sqlite", action="store_true", help="Save to output/scrapit.db")
+    p.add_argument("--output-dir", help="Custom output directory (overrides default 'output/')")
     p.add_argument("--preview", action="store_true", help="Print only, do not save")
     p.add_argument("--diff", action="store_true", help="Diff against previous JSON output")
 

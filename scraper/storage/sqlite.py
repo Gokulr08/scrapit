@@ -8,14 +8,21 @@ Automatically creates the table on first use.
 import json
 import sqlite3
 from datetime import datetime
+from pathlib import Path
 from scraper.config import OUTPUT_DIR
 
 _DB_PATH = OUTPUT_DIR / "scrapit.db"
 
 
-def _connect() -> sqlite3.Connection:
-    OUTPUT_DIR.mkdir(exist_ok=True)
-    conn = sqlite3.connect(str(_DB_PATH))
+def _get_db_path(output_dir: str | None = None) -> Path:
+    base = Path(output_dir) if output_dir else OUTPUT_DIR
+    return base / "scrapit.db"
+
+
+def _connect(output_dir: str | None = None) -> sqlite3.Connection:
+    db_path = _get_db_path(output_dir)
+    db_path.parent.mkdir(parents=True, exist_ok=True)
+    conn = sqlite3.connect(str(db_path))
     conn.row_factory = sqlite3.Row
     conn.execute("""
         CREATE TABLE IF NOT EXISTS scrapes (
@@ -32,8 +39,9 @@ def _connect() -> sqlite3.Connection:
     return conn
 
 
-def save(data: dict, directive_name: str) -> str:
-    conn = _connect()
+def save(data: dict, directive_name: str, *, output_dir: str | None = None) -> str:
+    db_path = _get_db_path(output_dir)
+    conn = _connect(output_dir)
     serializable = {k: str(v) for k, v in data.items() if k != "_id"}
     conn.execute(
         "INSERT INTO scrapes (directive, url, timestamp, data) VALUES (?, ?, ?, ?)",
@@ -46,7 +54,7 @@ def save(data: dict, directive_name: str) -> str:
     )
     conn.commit()
     conn.close()
-    return str(_DB_PATH)
+    return str(db_path)
 
 
 def find_by_directive(directive_name: str, limit: int = 100) -> list[dict]:
