@@ -10,6 +10,7 @@ Supported rules (use in directive under `validate:`):
   max_length: N        — maximum string/list length
   pattern: regex       — string must match regex
   in: [a, b, c]        — value must be one of the listed options
+  not_in: [a, b, c]    — value must NOT be in the listed options
   not_empty: true      — string/list must not be empty
 """
 
@@ -107,5 +108,9 @@ def validate(result: dict, rules: dict) -> ValidationReport:
         # in (enum)
         if "in" in field_rules and value not in field_rules["in"]:
             report.add(field_name, "in", f"{value!r} not in allowed values: {field_rules['in']}")
+
+        # not_in (complement of in)
+        if "not_in" in field_rules and value in field_rules["not_in"]:
+            report.add(field_name, "not_in", f"{value!r} must not be in: {field_rules['not_in']}")
 
     return report

@@ -1,0 +1,57 @@
+# Product Hunt — daily products scraping
+# Demonstrates: pagination, nested selectors, transforms
+# Usage: python -m scraper.main scrape producthunt.yaml --json
+
+site: https://www.producthunt.com
+use: beautifulsoup
+
+cache:
+  ttl: 3600   # cache for 1 hour
+
+paginate:
+  selector: 'a[aria-label="Next"]'
+  attr: href
+  max_pages: 2
+
+scrape:
+  products:
+    - '.styles_item__3z6l4'
+    - all: true
+
+  names:
+    - '.styles_name__2pgbq'
+    - attr: text
+      all: true
+
+  descriptions:
+    - '.styles_tagline__3z6l4'
+    - attr: text
+      all: true
+
+  makers:
+    - '.styles_maker__3z6l4'
+    - attr: text
+    - all: true
+
+  votes:
+    - '[data-test="vote-button"]'
+    - attr: text
+    - all: true
+
+transform:
+  names:
+    - strip
+  descriptions:
+    - strip
+  makers:
+    - {replace: {"by ": ""}}
+    - strip
+  votes:
+    - strip
+    - {replace: {",": ""}}
+    - int
+
+validate:
+  names:
+    required: true
+    not_empty: true
