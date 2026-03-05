@@ -4,9 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Scrapit — YAML-driven web scraper framework</title>
-  <meta name="description" content="Scrape any website with just a YAML file. No code needed for new targets." />
-  <meta property="og:title" content="Scrapit" />
-  <meta property="og:description" content="Scrape any website with just a YAML file." />
+  <meta name="description" content="Scrape any website with just a YAML file. Transforms, validation, storage, and native AI agent integrations built in." />
+  <meta property="og:title" content="Scrapit — YAML-driven web scraper" />
+  <meta property="og:description" content="Scrape any website with just a YAML file. No code needed for new targets." />
   <meta property="og:type" content="website" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -14,286 +14,458 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0d1117;
-      --bg2:       #161b22;
-      --bg3:       #21262d;
-      --border:    #30363d;
-      --text:      #e6edf3;
-      --muted:     #8b949e;
-      --accent:    #58a6ff;
-      --accent2:   #3fb950;
-      --accent3:   #f78166;
-      --radius:    10px;
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #21262d;
+      --border:  #30363d;
+      --text:    #e6edf3;
+      --muted:   #8b949e;
+      --accent:  #58a6ff;
+      --green:   #3fb950;
+      --orange:  #f78166;
+      --purple:  #bc8cff;
+      --yellow:  #e3b341;
+      --r: 10px;
     }
 
     html { scroll-behavior: smooth; }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    code { font-family: 'JetBrains Mono', monospace; font-size: .85em; background: var(--bg3); padding: .1em .35em; border-radius: 4px; }
 
-    /* ── NAV ──────────────────────────────────────────────── */
+    /* ── NAV ─────────────────────────────────────── */
     nav {
       position: sticky; top: 0; z-index: 100;
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 2rem; height: 60px;
-      background: rgba(13,17,23,.85);
-      backdrop-filter: blur(12px);
+      background: rgba(13,17,23,.9); backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
     }
     .nav-logo { font-weight: 700; font-size: 1.1rem; color: var(--text); }
     .nav-logo span { color: var(--accent); }
-    .nav-links { display: flex; gap: 1.5rem; font-size: .9rem; color: var(--muted); }
-    .nav-links a { color: var(--muted); }
+    .nav-links { display: flex; gap: 1.5rem; font-size: .875rem; }
+    .nav-links a { color: var(--muted); transition: color .15s; }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
-    .nav-gh {
-      display: flex; align-items: center; gap: .4rem;
-      padding: .4rem .9rem; border-radius: 6px;
-      border: 1px solid var(--border);
-      background: var(--bg3); color: var(--text);
-      font-size: .85rem; font-weight: 500;
-      transition: border-color .15s;
-    }
-    .nav-gh:hover { border-color: var(--accent); text-decoration: none; }
-
-    /* ── HERO ─────────────────────────────────────────────── */
-    .hero {
-      text-align: center;
-      padding: 6rem 1.5rem 5rem;
-      position: relative; overflow: hidden;
-    }
-    .hero::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: radial-gradient(ellipse 80% 50% at 50% -20%, rgba(88,166,255,.12), transparent);
-      pointer-events: none;
-    }
-    .badge {
-      display: inline-block;
-      padding: .25rem .75rem; border-radius: 99px;
-      border: 1px solid rgba(88,166,255,.3);
-      background: rgba(88,166,255,.08);
-      color: var(--accent); font-size: .8rem; font-weight: 500;
-      margin-bottom: 1.5rem;
-    }
-    h1 {
-      font-size: clamp(2.5rem, 6vw, 4.5rem);
-      font-weight: 700; letter-spacing: -.03em;
-      line-height: 1.1; margin-bottom: 1.25rem;
-    }
-    h1 span { color: var(--accent); }
-    .hero-sub {
-      font-size: clamp(1rem, 2.5vw, 1.25rem);
-      color: var(--muted); max-width: 560px; margin: 0 auto 2.5rem;
-    }
-    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .nav-right { display: flex; gap: .75rem; align-items: center; }
     .btn {
       display: inline-flex; align-items: center; gap: .4rem;
-      padding: .65rem 1.4rem; border-radius: var(--radius);
-      font-size: .95rem; font-weight: 500;
-      transition: opacity .15s, transform .1s;
-      cursor: pointer;
+      padding: .5rem 1.1rem; border-radius: var(--r);
+      font-size: .875rem; font-weight: 500;
+      transition: opacity .15s, transform .1s; cursor: pointer;
     }
     .btn:hover { opacity: .85; transform: translateY(-1px); text-decoration: none; }
     .btn-primary { background: var(--accent); color: #0d1117; }
     .btn-outline { border: 1px solid var(--border); background: var(--bg3); color: var(--text); }
+    .btn-sm { padding: .35rem .8rem; font-size: .8rem; }
 
+    /* ── HERO ────────────────────────────────────── */
+    .hero {
+      text-align: center; padding: 6rem 1.5rem 4.5rem;
+      position: relative; overflow: hidden;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 50% at 50% -10%, rgba(88,166,255,.13), transparent);
+      pointer-events: none;
+    }
+    .badges { display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.75rem; }
+    .badge {
+      display: inline-block; padding: .2rem .65rem; border-radius: 99px;
+      border: 1px solid rgba(88,166,255,.25); background: rgba(88,166,255,.07);
+      color: var(--accent); font-size: .78rem; font-weight: 500;
+    }
+    .badge.green { border-color: rgba(63,185,80,.25); background: rgba(63,185,80,.07); color: var(--green); }
+    .badge.purple { border-color: rgba(188,140,255,.25); background: rgba(188,140,255,.07); color: var(--purple); }
+    h1 {
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 800; letter-spacing: -.035em;
+      line-height: 1.08; margin-bottom: 1.25rem;
+    }
+    h1 em { color: var(--accent); font-style: normal; }
+    .hero-sub {
+      font-size: clamp(1rem, 2.2vw, 1.2rem);
+      color: var(--muted); max-width: 540px; margin: 0 auto 2.5rem;
+    }
+    .hero-actions { display: flex; gap: .75rem; justify-content: center; flex-wrap: wrap; }
+    .install-row {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      margin-top: 2rem;
+    }
     .install-box {
       display: inline-flex; align-items: center; gap: .75rem;
-      margin-top: 2.5rem; padding: .75rem 1.25rem;
+      padding: .65rem 1.1rem;
       background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--radius); font-family: 'JetBrains Mono', monospace;
-      font-size: .9rem; color: var(--muted);
+      border-radius: var(--r); font-family: 'JetBrains Mono', monospace;
+      font-size: .85rem; color: var(--muted);
     }
-    .install-box span { color: var(--accent2); }
+    .install-box .ps { color: var(--green); }
     .copy-btn {
       background: none; border: none; cursor: pointer;
-      color: var(--muted); padding: 0; font-size: .85rem;
-      transition: color .15s;
+      color: var(--muted); font-size: .85rem; transition: color .15s; padding: 0;
     }
     .copy-btn:hover { color: var(--text); }
 
-    /* ── SECTION ──────────────────────────────────────────── */
+    /* ── STATS ───────────────────────────────────── */
+    .stats {
+      border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: var(--bg2);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      max-width: 900px; margin: 0 auto;
+    }
+    .stat {
+      padding: 2rem 1rem; text-align: center;
+      border-right: 1px solid var(--border);
+    }
+    .stat:last-child { border-right: none; }
+    .stat-num { font-size: 2rem; font-weight: 800; color: var(--accent); letter-spacing: -.03em; }
+    .stat-label { font-size: .8rem; color: var(--muted); margin-top: .25rem; }
+
+    /* ── SECTIONS ────────────────────────────────── */
     section { padding: 5rem 1.5rem; }
     .container { max-width: 1100px; margin: 0 auto; }
     .section-label {
-      font-size: .8rem; font-weight: 600; letter-spacing: .08em;
-      text-transform: uppercase; color: var(--accent); margin-bottom: .75rem;
+      font-size: .75rem; font-weight: 700; letter-spacing: .1em;
+      text-transform: uppercase; color: var(--accent); margin-bottom: .6rem;
     }
     h2 {
-      font-size: clamp(1.5rem, 3vw, 2.25rem);
-      font-weight: 700; margin-bottom: 1rem; letter-spacing: -.02em;
+      font-size: clamp(1.6rem, 3vw, 2.2rem);
+      font-weight: 700; margin-bottom: .75rem; letter-spacing: -.025em;
     }
-    .section-sub { color: var(--muted); max-width: 580px; margin-bottom: 3rem; }
+    .section-sub { color: var(--muted); max-width: 580px; margin-bottom: 3rem; font-size: .95rem; }
 
-    /* ── DEMO SPLIT ───────────────────────────────────────── */
-    .demo { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .demo-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start;
+    /* ── TABS ────────────────────────────────────── */
+    .tab-bar { display: flex; gap: .25rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+    .tab-btn {
+      padding: .45rem 1rem; border-radius: 6px;
+      border: 1px solid transparent; background: none;
+      font-size: .85rem; font-weight: 500; color: var(--muted);
+      cursor: pointer; font-family: inherit; transition: all .15s;
     }
-    @media (max-width: 768px) { .demo-grid { grid-template-columns: 1fr; } }
-    .demo-text h2 { margin-bottom: .75rem; }
-    .demo-text p { color: var(--muted); margin-bottom: 1rem; }
-    .demo-step {
-      display: flex; gap: .75rem; align-items: flex-start;
-      margin-bottom: 1rem;
-    }
-    .step-num {
-      flex-shrink: 0; width: 24px; height: 24px;
-      border-radius: 50%; background: var(--accent);
-      color: #0d1117; font-size: .75rem; font-weight: 700;
-      display: flex; align-items: center; justify-content: center;
-      margin-top: .15rem;
-    }
-    .step-text { color: var(--muted); font-size: .95rem; }
-    .step-text strong { color: var(--text); }
+    .tab-btn:hover { color: var(--text); border-color: var(--border); }
+    .tab-btn.active { background: var(--bg3); border-color: var(--border); color: var(--text); }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
 
-    /* ── CODE BLOCK ───────────────────────────────────────── */
-    .code-card {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); overflow: hidden;
-    }
+    /* ── CODE CARD ───────────────────────────────── */
+    .code-card { background: var(--bg); border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; }
+    .code-card.bg2 { background: var(--bg2); }
     .code-header {
       display: flex; align-items: center; gap: .5rem;
-      padding: .6rem 1rem; border-bottom: 1px solid var(--border);
+      padding: .55rem 1rem; border-bottom: 1px solid var(--border);
       background: var(--bg2);
     }
-    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
     .dot-r { background: #ff5f57; }
     .dot-y { background: #ffbd2e; }
     .dot-g { background: #28c940; }
-    .code-filename { margin-left: .5rem; font-family: 'JetBrains Mono', monospace; font-size: .8rem; color: var(--muted); }
+    .code-filename { margin-left: .4rem; font-family: 'JetBrains Mono', monospace; font-size: .78rem; color: var(--muted); }
     pre {
       padding: 1.25rem; font-family: 'JetBrains Mono', monospace;
-      font-size: .82rem; line-height: 1.7; overflow-x: auto;
+      font-size: .8rem; line-height: 1.75; overflow-x: auto; tab-size: 2;
     }
     .kw  { color: #ff7b72; }
     .str { color: #a5d6ff; }
     .val { color: #79c0ff; }
-    .cmt { color: #8b949e; }
+    .cmt { color: #6e7681; }
     .key { color: #7ee787; }
-    .cmd { color: var(--accent2); }
+    .num { color: #f2cc60; }
+    .cmd { color: var(--green); }
     .prm { color: var(--accent); }
+    .out { color: #6e7681; }
 
-    /* ── FEATURES GRID ────────────────────────────────────── */
-    .features { background: var(--bg); }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.25rem;
-    }
-    .feature-card {
-      padding: 1.5rem; border-radius: var(--radius);
-      border: 1px solid var(--border); background: var(--bg2);
-      transition: border-color .2s, transform .2s;
-    }
-    .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
-    .feature-icon { font-size: 1.5rem; margin-bottom: .75rem; }
-    .feature-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
-    .feature-card p { font-size: .88rem; color: var(--muted); line-height: 1.55; }
+    /* ── TWO-COL ─────────────────────────────────── */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: start; }
+    .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+    @media (max-width: 900px) { .two-col, .three-col { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .nav-links { display: none; } }
 
-    /* ── INTEGRATIONS ─────────────────────────────────────── */
-    .integrations { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-    .int-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 1.25rem;
+    /* ── DEMO ────────────────────────────────────── */
+    .demo { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .step-list { list-style: none; display: flex; flex-direction: column; gap: .85rem; margin-bottom: 2rem; }
+    .step-item { display: flex; gap: .75rem; align-items: flex-start; }
+    .step-n {
+      flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%;
+      background: var(--accent); color: #0d1117;
+      font-size: .72rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center; margin-top: .18rem;
     }
-    .int-card {
-      padding: 1.5rem; border-radius: var(--radius);
+    .step-t { font-size: .9rem; color: var(--muted); }
+    .step-t strong { color: var(--text); }
+
+    /* ── REFERENCE ───────────────────────────────── */
+    .reference { background: var(--bg); }
+    .ref-note {
+      display: inline-flex; gap: .4rem; align-items: center;
+      font-size: .78rem; color: var(--muted); margin-bottom: 1.5rem;
+    }
+    .ref-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); display: inline-block; }
+
+    /* ── FEATURES ────────────────────────────────── */
+    .features { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(270px, 1fr)); gap: 1rem; }
+    .feat-card {
+      padding: 1.4rem; border-radius: var(--r);
+      border: 1px solid var(--border); background: var(--bg);
+      transition: border-color .2s, transform .15s;
+    }
+    .feat-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .feat-icon { font-size: 1.3rem; margin-bottom: .6rem; }
+    .feat-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .3rem; }
+    .feat-card p { font-size: .85rem; color: var(--muted); line-height: 1.55; }
+
+    /* ── TRANSFORMS TABLE ────────────────────────── */
+    .transforms { background: var(--bg); }
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    th {
+      text-align: left; padding: .65rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted); font-weight: 600; font-size: .78rem;
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    td { padding: .6rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg2); }
+    .t-name { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: .82rem; }
+    .t-ex { font-family: 'JetBrains Mono', monospace; color: var(--muted); font-size: .78rem; }
+    .t-desc { color: var(--muted); }
+    .table-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; background: var(--bg2); }
+
+    /* ── STORAGE ─────────────────────────────────── */
+    .storage { background: var(--bg2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .storage-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+    .storage-card {
+      padding: 1.4rem; border-radius: var(--r);
       border: 1px solid var(--border); background: var(--bg);
     }
-    .int-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+    .storage-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .5rem; }
+    .storage-card .flag { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: .78rem; display: block; margin-bottom: .5rem; }
+    .storage-card p { font-size: .83rem; color: var(--muted); }
+
+    /* ── AI INTEGRATIONS ─────────────────────────── */
+    .integrations { background: var(--bg); }
+    .int-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.25rem; }
+    .int-card { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; background: var(--bg2); }
+    .int-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .85rem 1.1rem; border-bottom: 1px solid var(--border);
+    }
+    .int-header h3 { font-size: .9rem; font-weight: 600; }
     .int-badge {
-      font-size: .7rem; padding: .15rem .5rem; border-radius: 4px;
-      background: rgba(88,166,255,.12); color: var(--accent); font-weight: 500;
+      font-size: .68rem; padding: .12rem .45rem; border-radius: 4px;
+      background: rgba(88,166,255,.12); color: var(--accent); font-weight: 600;
     }
+    .int-badge.green { background: rgba(63,185,80,.12); color: var(--green); }
+    .int-badge.purple { background: rgba(188,140,255,.12); color: var(--purple); }
+    .int-badge.yellow { background: rgba(227,179,65,.12); color: var(--yellow); }
+    .int-card pre { font-size: .78rem; }
+    .int-install {
+      padding: .5rem 1rem; border-top: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+      color: var(--muted); background: var(--bg);
+    }
+    .int-install span { color: var(--green); }
 
-    /* ── CONTRIBUTE ───────────────────────────────────────── */
-    .contribute { background: var(--bg); }
-    .contrib-grid {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.25rem;
-    }
+    /* ── CONTRIBUTE ──────────────────────────────── */
+    .contribute { background: var(--bg2); border-top: 1px solid var(--border); }
+    .contrib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 1rem; }
     .contrib-card {
-      padding: 1.5rem; border-radius: var(--radius);
-      border: 1px solid var(--border); background: var(--bg2);
+      padding: 1.4rem; border-radius: var(--r);
+      border: 1px solid var(--border); background: var(--bg);
     }
-    .contrib-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .5rem; }
-    .contrib-card p { font-size: .87rem; color: var(--muted); }
-    .contrib-card a { color: var(--accent); font-size: .87rem; }
+    .contrib-card h3 { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+    .contrib-card p { font-size: .84rem; color: var(--muted); margin-bottom: .75rem; }
+    .contrib-card a { font-size: .84rem; }
 
-    /* ── FOOTER ───────────────────────────────────────────── */
+    /* ── FAQ ─────────────────────────────────────── */
+    .faq { background: var(--bg); border-top: 1px solid var(--border); }
+    .faq-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    @media (max-width: 700px) { .faq-grid { grid-template-columns: 1fr; } }
+    .faq-item h3 { font-size: .95rem; font-weight: 600; margin-bottom: .4rem; }
+    .faq-item p { font-size: .87rem; color: var(--muted); }
+
+    /* ── FOOTER ──────────────────────────────────── */
     footer {
-      text-align: center; padding: 3rem 1.5rem;
+      text-align: center; padding: 2.5rem 1.5rem;
       border-top: 1px solid var(--border);
-      color: var(--muted); font-size: .875rem;
+      color: var(--muted); font-size: .85rem;
     }
     footer a { color: var(--muted); }
     footer a:hover { color: var(--text); }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: .75rem; }
 
-    /* ── UTILS ────────────────────────────────────────────── */
-    .divider { height: 1px; background: var(--border); margin: 0; }
-    .text-center { text-align: center; }
+    /* ── MISC ────────────────────────────────────── */
+    .gap-1 { margin-bottom: 1rem; }
+    .pill {
+      display: inline-block; padding: .1rem .5rem; border-radius: 4px;
+      font-size: .72rem; font-weight: 600; text-transform: uppercase;
+    }
+    .pill-blue { background: rgba(88,166,255,.12); color: var(--accent); }
+    .pill-green { background: rgba(63,185,80,.12); color: var(--green); }
   </style>
 </head>
 <body>
 
-<!-- NAV -->
+<!-- ── NAV ──────────────────────────────────────── -->
 <nav>
   <div class="nav-logo">scrap<span>it</span></div>
   <div class="nav-links">
+    <a href="#demo">How it works</a>
     <a href="#features">Features</a>
-    <a href="#integrations">Integrations</a>
+    <a href="#transforms">Transforms</a>
+    <a href="#integrations">AI Integrations</a>
     <a href="#contribute">Contribute</a>
   </div>
-  <a class="nav-gh btn-outline btn" href="https://github.com/joaobenedetmachado/scrapit" target="_blank">
-    <svg height="16" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
-    GitHub
-  </a>
+  <div class="nav-right">
+    <a class="btn btn-outline btn-sm" href="https://pypi.org/project/scrapit-scraper/" target="_blank">PyPI</a>
+    <a class="btn btn-outline btn-sm" href="https://github.com/joaobenedetmachado/scrapit" target="_blank">
+      <svg height="14" viewBox="0 0 16 16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      GitHub
+    </a>
+  </div>
 </nav>
 
-<!-- HERO -->
+<!-- ── HERO ──────────────────────────────────────── -->
 <section class="hero">
-  <div class="badge">Open Source · MIT License</div>
-  <h1>Scrape any website<br /><span>with just a YAML</span></h1>
+  <div class="badges">
+    <span class="badge">MIT License</span>
+    <span class="badge green">Python 3.10+</span>
+    <span class="badge purple">AI-native</span>
+  </div>
+  <h1>Scrape any website<br/><em>with just a YAML file</em></h1>
   <p class="hero-sub">
     Define your target in a config file. Scrapit handles fetching, parsing,
-    transforming, validating, and storing — no boilerplate required.
+    transforms, validation, storage, and AI agent integration — zero boilerplate.
   </p>
   <div class="hero-actions">
     <a class="btn btn-primary" href="https://github.com/joaobenedetmachado/scrapit" target="_blank">Get started →</a>
+    <a class="btn btn-outline" href="#demo">See how it works</a>
     <a class="btn btn-outline" href="https://github.com/joaobenedetmachado/scrapit/issues?q=label%3A%22good+first+issue%22" target="_blank">Good first issues</a>
   </div>
-  <div class="install-box">
-    <span>$</span> pip install -r requirements.txt
-    <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install -r requirements.txt');this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500)">⎘</button>
+  <div class="install-row">
+    <div class="install-box">
+      <span class="ps">$</span> pip install scrapit-scraper
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install scrapit-scraper');this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500)">⎘</button>
+    </div>
+    <div class="install-box">
+      <span class="ps">$</span> pip install scrapit-scraper[anthropic,mcp]
+      <button class="copy-btn" onclick="navigator.clipboard.writeText('pip install scrapit-scraper[anthropic,mcp]');this.textContent='✓';setTimeout(()=>this.textContent='⎘',1500)">⎘</button>
+    </div>
   </div>
 </section>
 
-<!-- DEMO -->
+<!-- ── STATS ──────────────────────────────────────── -->
+<div class="stats">
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-num">15+</div><div class="stat-label">Transforms</div></div>
+    <div class="stat"><div class="stat-num">4</div><div class="stat-label">Storage backends</div></div>
+    <div class="stat"><div class="stat-num">5</div><div class="stat-label">AI frameworks</div></div>
+    <div class="stat"><div class="stat-num">2</div><div class="stat-label">Scraping backends</div></div>
+    <div class="stat"><div class="stat-num">0</div><div class="stat-label">Boilerplate</div></div>
+  </div>
+</div>
+
+<!-- ── HOW IT WORKS ───────────────────────────────── -->
 <section class="demo" id="demo">
   <div class="container">
-    <div class="demo-grid">
-      <div class="demo-text">
+    <div class="two-col">
+      <div>
         <div class="section-label">How it works</div>
         <h2>Write YAML.<br/>Get data.</h2>
-        <div class="demo-step">
-          <div class="step-num">1</div>
-          <div class="step-text"><strong>Describe your target</strong> — define the site, CSS selectors, and what to do with the data in a YAML file.</div>
+        <ul class="step-list">
+          <li class="step-item">
+            <div class="step-n">1</div>
+            <div class="step-t"><strong>Describe your target</strong> — site URL, CSS selectors, transforms, and validation rules in a YAML file.</div>
+          </li>
+          <li class="step-item">
+            <div class="step-n">2</div>
+            <div class="step-t"><strong>Run one command</strong> — Scrapit fetches the page, applies your pipeline, and saves the result.</div>
+          </li>
+          <li class="step-item">
+            <div class="step-n">3</div>
+            <div class="step-t"><strong>Pick your output</strong> — JSON, CSV, SQLite, or MongoDB. Same directive, different flag.</div>
+          </li>
+          <li class="step-item">
+            <div class="step-n">4</div>
+            <div class="step-t"><strong>Plug into AI</strong> — use <code>ScrapitToolkit</code> or the MCP server to give any agent web access.</div>
+          </li>
+        </ul>
+
+        <div class="tab-bar" id="demo-tabs">
+          <button class="tab-btn active" onclick="switchTab('basic', this)">Basic scrape</button>
+          <button class="tab-btn" onclick="switchTab('spider', this)">Spider mode</button>
+          <button class="tab-btn" onclick="switchTab('ai', this)">AI agent</button>
         </div>
-        <div class="demo-step">
-          <div class="step-num">2</div>
-          <div class="step-text"><strong>Run the CLI</strong> — one command fetches, parses, transforms, validates, and saves.</div>
+
+        <div id="tab-basic" class="tab-panel active">
+          <div class="code-card">
+            <div class="code-header">
+              <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+              <span class="code-filename">terminal</span>
+            </div>
+            <pre><span class="cmd">$</span> scrapit scrape product <span class="prm">--json --diff</span>
+
+<span class="out">{
+  "title": "A Light in the Attic",
+  "price": 51.77,
+  "rating": "Three",
+  "url": "https://books.toscrape.com/...",
+  "timestamp": "2026-03-05 09:00:00"
+}
+
+→ saved: output/product.json
+→ no changes since last run</span></pre>
+          </div>
         </div>
-        <div class="demo-step">
-          <div class="step-num">3</div>
-          <div class="step-text"><strong>Pick your output</strong> — JSON, CSV, SQLite, or MongoDB. All from the same directive.</div>
+
+        <div id="tab-spider" class="tab-panel">
+          <div class="code-card">
+            <div class="code-header">
+              <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+              <span class="code-filename">directives/blog.yaml</span>
+            </div>
+            <pre><span class="key">site</span>: <span class="str">https://myblog.com</span>
+<span class="key">use</span>: <span class="val">beautifulsoup</span>
+
+<span class="key">follow</span>:
+  <span class="key">selector</span>: <span class="str">'a.post-link'</span>
+  <span class="key">attr</span>: <span class="val">href</span>
+  <span class="key">max</span>: <span class="num">50</span>
+  <span class="key">same_domain</span>: <span class="val">true</span>
+
+<span class="key">scrape</span>:
+  <span class="key">title</span>:
+    - <span class="str">'h1.post-title'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+  <span class="key">body</span>:
+    - <span class="str">'div.post-content'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+  <span class="key">date</span>:
+    - <span class="str">'time'</span>
+    - <span class="key">attr</span>: <span class="val">datetime</span></pre>
+          </div>
+        </div>
+
+        <div id="tab-ai" class="tab-panel">
+          <div class="code-card">
+            <div class="code-header">
+              <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+              <span class="code-filename">agent.py</span>
+            </div>
+            <pre><span class="kw">from</span> scraper.integrations.anthropic <span class="kw">import</span> ScrapitAnthropicAgent
+
+agent = ScrapitAnthropicAgent(model=<span class="str">"claude-opus-4-6"</span>)
+
+answer = agent.run(
+  <span class="str">"What are the top 5 Hacker News posts today? "</span>
+  <span class="str">"Summarize each one in one sentence."</span>
+)
+
+<span class="out"># Agent automatically calls scrape_page("https://news.ycombinator.com"),
+# reads the results, and produces a final answer.</span></pre>
+          </div>
         </div>
       </div>
 
@@ -304,7 +476,13 @@
             <span class="code-filename">directives/product.yaml</span>
           </div>
           <pre><span class="key">site</span>: <span class="str">https://books.toscrape.com/catalogue/a-light-in-the-attic_1000</span>
-<span class="key">use</span>: <span class="val">beautifulsoup</span>
+<span class="key">use</span>: <span class="val">beautifulsoup</span>   <span class="cmt"># or: playwright</span>
+
+<span class="key">headers</span>:
+  <span class="key">Accept-Language</span>: <span class="str">en-US,en;q=0.9</span>
+
+<span class="key">cache</span>:
+  <span class="key">ttl</span>: <span class="num">3600</span>    <span class="cmt"># don't re-fetch during dev</span>
 
 <span class="key">scrape</span>:
   <span class="key">title</span>:
@@ -316,6 +494,10 @@
   <span class="key">rating</span>:
     - <span class="str">'p.star-rating'</span>
     - <span class="key">attr</span>: <span class="val">class</span>
+  <span class="key">tags</span>:
+    - <span class="str">'ul.breadcrumb li'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+      <span class="key">all</span>: <span class="val">true</span>    <span class="cmt"># return all matches as list</span>
 
 <span class="key">transform</span>:
   <span class="key">price</span>:
@@ -323,191 +505,469 @@
     - <span class="key">replace</span>: {<span class="str">"£"</span>: <span class="str">""</span>}
     - <span class="val">float</span>
   <span class="key">rating</span>:
-    - <span class="val">last</span>    <span class="cmt"># "star-rating Three" → "Three"</span>
+    - <span class="val">last</span>         <span class="cmt"># "star-rating Three" → "Three"</span>
+  <span class="key">title</span>:
+    - <span class="val">strip</span>
+    - <span class="val">slugify</span>      <span class="cmt"># "A Light in the Attic" → "a-light-in-the-attic"</span>
 
 <span class="key">validate</span>:
   <span class="key">price</span>:
     <span class="key">required</span>: <span class="val">true</span>
     <span class="key">type</span>: <span class="val">float</span>
-    <span class="key">min</span>: <span class="val">0</span></pre>
+    <span class="key">min</span>: <span class="num">0</span>
+  <span class="key">title</span>:
+    <span class="key">required</span>: <span class="val">true</span>
+    <span class="key">min_length</span>: <span class="num">2</span>
+
+<span class="key">notify</span>:
+  <span class="key">webhook</span>: <span class="str">https://hooks.slack.com/...</span>
+  <span class="cmt"># fires when --diff detects a price change</span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ───────────────────────────────────── -->
+<section class="features" id="features">
+  <div class="container">
+    <div class="section-label">Features</div>
+    <h2>Everything you need, nothing you don't</h2>
+    <p class="section-sub">All configured from YAML. No Python needed to add a new scraping target.</p>
+
+    <div class="feat-grid">
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>Two scraping backends</h3>
+        <p>BeautifulSoup for fast static pages. Playwright for JavaScript-heavy sites. Switch with <code>use: playwright</code>.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📄</div>
+        <h3>Pagination</h3>
+        <p>Follow "next page" links automatically with <code>paginate:</code>. Controls <code>selector</code>, <code>attr</code>, and <code>max_pages</code>.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🕷️</div>
+        <h3>Spider mode</h3>
+        <p>Discover and scrape all linked pages from an index. Supports <code>same_domain</code> and <code>max</code> page limits.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔄</div>
+        <h3>Transform pipeline</h3>
+        <p>15+ declarative transforms per field: <code>strip</code>, <code>regex</code>, <code>float</code>, <code>slugify</code>, <code>template</code>, <code>remove_tags</code> and more.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">✅</div>
+        <h3>Per-field validation</h3>
+        <p>Enforce data quality at scrape time: <code>required</code>, <code>type</code>, <code>min/max</code>, <code>pattern</code>, <code>in</code>. Runs after transforms.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💾</div>
+        <h3>4 storage backends</h3>
+        <p>JSON, CSV (append mode), SQLite (zero-config), MongoDB. Mix and match with CLI flags on each run.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚡</div>
+        <h3>HTTP cache</h3>
+        <p>File-based cache with TTL. Avoid hammering sites during development. Set <code>cache: {ttl: 3600}</code>.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔔</div>
+        <h3>Change detection</h3>
+        <p>Diff results against the previous run. Fire a webhook when content changes. Use with <code>--diff</code>.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🔌</div>
+        <h3>Lifecycle hooks</h3>
+        <p>Register Python callbacks for <code>before_scrape</code>, <code>after_scrape</code>, <code>on_error</code>, <code>on_change</code>, <code>on_save</code>.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">🤖</div>
+        <h3>AI-native</h3>
+        <p>Native integrations for Claude, OpenAI, LangChain, CrewAI, LlamaIndex, and MCP. One import away.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⚙️</div>
+        <h3>Fallback selectors</h3>
+        <p>Define a list of selectors per field. Scrapit tries them in order and uses the first match.</p>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <h3>Run reports</h3>
+        <p>Timing, field coverage, and validation summary printed after every scrape. Always know what happened.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── TRANSFORMS ─────────────────────────────────── -->
+<section class="transforms" id="transforms">
+  <div class="container">
+    <div class="section-label">Transform pipeline</div>
+    <h2>Clean data before it's stored</h2>
+    <p class="section-sub">Transforms run in order, per field, after scraping. Chain as many as you need in YAML.</p>
+
+    <div class="two-col" style="gap:3rem;">
+      <div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr><th>Transform</th><th>Example</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+              <tr><td class="t-name">strip</td><td class="t-ex">- strip</td><td class="t-desc">Remove leading/trailing whitespace</td></tr>
+              <tr><td class="t-name">lower / upper / title</td><td class="t-ex">- lower</td><td class="t-desc">Change case</td></tr>
+              <tr><td class="t-name">int / float</td><td class="t-ex">- float</td><td class="t-desc">Parse number, removes non-numeric chars</td></tr>
+              <tr><td class="t-name">regex</td><td class="t-ex">{regex: '\d+'}</td><td class="t-desc">Extract first match</td></tr>
+              <tr><td class="t-name">regex_group</td><td class="t-ex">{regex_group: {pattern: '(\d+)', group: 1}}</td><td class="t-desc">Extract a capture group</td></tr>
+              <tr><td class="t-name">replace</td><td class="t-ex">{replace: {"€": ""}}</td><td class="t-desc">String substitution (multiple pairs)</td></tr>
+              <tr><td class="t-name">split</td><td class="t-ex">{split: ","}</td><td class="t-desc">Split string into list</td></tr>
+              <tr><td class="t-name">join</td><td class="t-ex">{join: ", "}</td><td class="t-desc">Join list into string</td></tr>
+              <tr><td class="t-name">first / last</td><td class="t-ex">- first</td><td class="t-desc">Pick first or last item from list</td></tr>
+              <tr><td class="t-name">default</td><td class="t-ex">{default: "N/A"}</td><td class="t-desc">Fallback when value is None</td></tr>
+              <tr><td class="t-name">slice</td><td class="t-ex">{slice: {end: 200}}</td><td class="t-desc">Substring or sublist</td></tr>
+              <tr><td class="t-name">prepend / append</td><td class="t-ex">{prepend: "https:"}</td><td class="t-desc">Add text before or after</td></tr>
+              <tr><td class="t-name">remove_tags</td><td class="t-ex">- remove_tags</td><td class="t-desc">Strip HTML tags from string</td></tr>
+              <tr><td class="t-name">template</td><td class="t-ex">{template: "USD {value}"}</td><td class="t-desc">String template with {value} or {field}</td></tr>
+              <tr><td class="t-name">slugify</td><td class="t-ex">- slugify</td><td class="t-desc">"Hello World" → "hello-world"</td></tr>
+              <tr><td class="t-name">normalize_whitespace</td><td class="t-ex">- normalize_whitespace</td><td class="t-desc">Collapse multiple spaces/newlines</td></tr>
+              <tr><td class="t-name">truncate</td><td class="t-ex">{truncate: 100}</td><td class="t-desc">Cut at N chars without breaking words</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <p style="color:var(--muted); font-size:.88rem; margin-bottom:1.25rem;">Transforms chain left to right. Each step receives the output of the previous one.</p>
+        <div class="code-card">
+          <div class="code-header">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+            <span class="code-filename">example — price cleaning</span>
+          </div>
+          <pre><span class="key">transform</span>:
+  <span class="key">price</span>:
+    - <span class="val">strip</span>                    <span class="cmt"># "  £ 12,99  " → "£ 12,99"</span>
+    - <span class="key">replace</span>: {<span class="str">"£"</span>: <span class="str">""</span>, <span class="str">","</span>: <span class="str">"."</span>}
+                              <span class="cmt"># "£ 12,99" → " 12.99"</span>
+    - <span class="val">float</span>                    <span class="cmt"># " 12.99" → 12.99</span>
+
+  <span class="key">title</span>:
+    - <span class="val">strip</span>
+    - <span class="val">normalize_whitespace</span>
+    - <span class="val">slugify</span>                  <span class="cmt"># "My  Title!" → "my-title"</span>
+
+  <span class="key">description</span>:
+    - <span class="val">remove_tags</span>              <span class="cmt"># strip &lt;b&gt;, &lt;span&gt; etc.</span>
+    - <span class="val">strip</span>
+    - <span class="key">truncate</span>: <span class="num">200</span>
+
+  <span class="key">tags</span>:
+    - <span class="key">split</span>: <span class="str">","</span>               <span class="cmt"># "a, b, c" → ["a", " b", " c"]</span>
+    - <span class="key">join</span>: <span class="str">" | "</span>             <span class="cmt"># ["a", "b", "c"] → "a | b | c"</span>
+
+  <span class="key">image_url</span>:
+    - <span class="key">prepend</span>: <span class="str">"https://site.com"</span>
+    - <span class="key">default</span>: <span class="str">"/placeholder.jpg"</span></pre>
         </div>
 
         <div class="code-card" style="margin-top:1rem;">
           <div class="code-header">
             <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
-            <span class="code-filename">terminal</span>
+            <span class="code-filename">example — validation</span>
           </div>
-          <pre><span class="cmd">$</span> python -m scraper.main <span class="prm">scrape</span> product <span class="prm">--json</span>
+          <pre><span class="key">validate</span>:
+  <span class="key">price</span>:
+    <span class="key">required</span>: <span class="val">true</span>
+    <span class="key">type</span>: <span class="val">float</span>
+    <span class="key">min</span>: <span class="num">0</span>
+    <span class="key">max</span>: <span class="num">10000</span>
 
-<span class="cmt">{
-  "title": "A Light in the Attic",
-  "price": 51.77,
-  "rating": "Three",
-  "url": "https://books.toscrape.com/...",
-  "timestamp": "2026-03-04 12:00:00"
-}</span>
+  <span class="key">title</span>:
+    <span class="key">required</span>: <span class="val">true</span>
+    <span class="key">min_length</span>: <span class="num">2</span>
+    <span class="key">max_length</span>: <span class="num">500</span>
 
-<span class="cmd">→</span> saved: output/product.json</pre>
+  <span class="key">status</span>:
+    <span class="key">in</span>: [<span class="str">active</span>, <span class="str">inactive</span>, <span class="str">pending</span>]
+
+  <span class="key">sku</span>:
+    <span class="key">pattern</span>: <span class="str">'^[A-Z]{2}\d{4}$'</span></pre>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FEATURES -->
-<section class="features" id="features">
+<!-- ── STORAGE ────────────────────────────────────── -->
+<section class="storage" id="storage">
   <div class="container">
-    <div class="section-label">Features</div>
-    <h2>Everything you need,<br/>nothing you don't</h2>
-    <p class="section-sub">All configured from YAML. No code required for new scraping targets.</p>
+    <div class="section-label">Storage</div>
+    <h2>Pick your output</h2>
+    <p class="section-sub">Same directive, different flag. Mix multiple outputs per run.</p>
 
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>Two backends</h3>
-        <p>BeautifulSoup for fast static pages. Playwright for JavaScript-rendered sites. Switch with one line in the YAML.</p>
+    <div class="storage-grid">
+      <div class="storage-card">
+        <h3>JSON</h3>
+        <span class="flag">--json</span>
+        <p>Last scrape saved as a single JSON file. Overwritten on each run. Good for monitoring and APIs.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">📄</div>
-        <h3>Pagination</h3>
-        <p>Follow "next page" links automatically. Define the selector once, Scrapit handles the rest up to <code>max_pages</code>.</p>
+      <div class="storage-card">
+        <h3>CSV</h3>
+        <span class="flag">--csv</span>
+        <p>Appends one row per run. Good for building a time-series dataset or importing into spreadsheets.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🕷️</div>
-        <h3>Spider mode</h3>
-        <p>Discover and scrape all linked pages from an index. Set <code>mode: spider</code> and a link selector — done.</p>
+      <div class="storage-card">
+        <h3>SQLite</h3>
+        <span class="flag">--sqlite</span>
+        <p>Zero-config local database. All runs stored in <code>output/scrapit.db</code>. Query with <code>scrapit query</code>.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔄</div>
-        <h3>Transform pipeline</h3>
-        <p>15+ declarative transforms: <code>strip</code>, <code>regex</code>, <code>float</code>, <code>replace</code>, <code>slugify</code>, <code>template</code> and more. All in YAML.</p>
+      <div class="storage-card">
+        <h3>MongoDB</h3>
+        <span class="flag">--mongo</span>
+        <p>Stores results in a MongoDB collection. Configure via <code>MONGO_URI</code> in <code>.env</code>.</p>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">✅</div>
-        <h3>Validation</h3>
-        <p>Ensure data quality with per-field rules: <code>required</code>, <code>type</code>, <code>min/max</code>, <code>pattern</code>, <code>in</code>.</p>
+    </div>
+
+    <div class="code-card" style="margin-top:1.5rem; max-width:680px;">
+      <div class="code-header">
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+        <span class="code-filename">multiple outputs + query</span>
       </div>
-      <div class="feature-card">
-        <div class="feature-icon">💾</div>
-        <h3>4 storage backends</h3>
-        <p>JSON, CSV (append mode), SQLite (zero-config), and MongoDB. Pick one per run with a CLI flag.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>HTTP cache</h3>
-        <p>File-based cache with configurable TTL. Stop hitting the site on every dev iteration.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔔</div>
-        <h3>Change detection</h3>
-        <p>Diff results against previous runs. Fire a webhook automatically when content changes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🔌</div>
-        <h3>Hook system</h3>
-        <p>Register callbacks for <code>before_scrape</code>, <code>after_scrape</code>, <code>on_error</code>, <code>on_change</code>. Extend without forking.</p>
-      </div>
+      <pre><span class="cmd">$</span> scrapit scrape product <span class="prm">--json --csv --sqlite --diff</span>
+
+<span class="cmd">$</span> scrapit query <span class="prm">--backend sqlite --directive product --limit 10</span>
+
+<span class="cmd">$</span> scrapit batch scraper/directives/ <span class="prm">--sqlite</span>  <span class="cmt"># run all directives</span></pre>
     </div>
   </div>
 </section>
 
-<!-- INTEGRATIONS -->
+<!-- ── AI INTEGRATIONS ────────────────────────────── -->
 <section class="integrations" id="integrations">
   <div class="container">
     <div class="section-label">AI Integrations</div>
     <h2>Plug into any AI agent</h2>
-    <p class="section-sub">Use Scrapit as a tool in LangChain, CrewAI, LangGraph, or LlamaIndex — your agent gets the ability to scrape the web on demand.</p>
+    <p class="section-sub">Native support for every major framework. All dependencies are optional — install only what you need.</p>
 
     <div class="int-grid">
+
       <div class="int-card">
-        <h3>LangChain / CrewAI <span class="int-badge">Tool</span></h3>
-        <div class="code-card">
-          <pre><span class="kw">from</span> scraper.integrations.langchain <span class="kw">import</span> ScrapitTool
-
-tools = [ScrapitTool()]
-
-<span class="cmt"># plug into any LangChain agent</span>
-agent = initialize_agent(
-  tools=tools,
-  llm=ChatOpenAI(model=<span class="str">"gpt-4o"</span>),
-  agent=AgentType.OPENAI_FUNCTIONS,
-)</pre>
+        <div class="int-header">
+          <h3>MCP Server</h3>
+          <span class="int-badge green">Claude Desktop · Cursor · Claude Code</span>
         </div>
+        <pre><span class="cmt"># Claude Code</span>
+<span class="cmd">$</span> claude mcp add scrapit -- \
+    python -m scraper.integrations.mcp
+
+<span class="cmt"># claude_desktop_config.json</span>
+{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"scrapit"</span>: {
+      <span class="str">"command"</span>: <span class="str">"python"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-m"</span>, <span class="str">"scraper.integrations.mcp"</span>]
+    }
+  }
+}</pre>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper[mcp]</div>
       </div>
 
       <div class="int-card">
-        <h3>LlamaIndex <span class="int-badge">RAG</span></h3>
-        <div class="code-card">
-          <pre><span class="kw">from</span> scraper.integrations.llamaindex <span class="kw">import</span> ScrapitReader
+        <div class="int-header">
+          <h3>Anthropic SDK</h3>
+          <span class="int-badge purple">claude-opus-4-6</span>
+        </div>
+        <pre><span class="kw">from</span> scraper.integrations.anthropic <span class="kw">import</span> (
+    ScrapitAnthropicAgent,
+    as_anthropic_tools,
+    handle_tool_call,
+)
+
+<span class="cmt"># Built-in agentic loop</span>
+agent = ScrapitAnthropicAgent(
+    model=<span class="str">"claude-opus-4-6"</span>
+)
+answer = agent.run(
+    <span class="str">"What are today's top HN posts?"</span>
+)</pre>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper[anthropic]</div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-header">
+          <h3>OpenAI SDK</h3>
+          <span class="int-badge yellow">gpt-4o</span>
+        </div>
+        <pre><span class="kw">from</span> scraper.integrations.openai <span class="kw">import</span> (
+    ScrapitOpenAIAgent,
+    as_openai_functions,
+    handle_function_call,
+)
+
+<span class="cmt"># Built-in agentic loop</span>
+agent = ScrapitOpenAIAgent(model=<span class="str">"gpt-4o"</span>)
+answer = agent.run(
+    <span class="str">"Summarize the Python Wikipedia page."</span>
+)</pre>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper[openai]</div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-header">
+          <h3>LangChain / CrewAI / LangGraph</h3>
+          <span class="int-badge">Toolkit</span>
+        </div>
+        <pre><span class="kw">from</span> scraper.integrations.langchain <span class="kw">import</span> ScrapitToolkit
+
+tools = ScrapitToolkit().get_tools()
+<span class="cmt"># → [ScrapitTool, ScrapitPageTool, ScrapitSelectorTool]</span>
+
+<span class="cmt"># LangChain agent</span>
+agent = initialize_agent(
+    tools=tools, llm=ChatOpenAI(model=<span class="str">"gpt-4o"</span>),
+    agent=AgentType.OPENAI_FUNCTIONS,
+)
+
+<span class="cmt"># CrewAI — same tools, different framework</span>
+researcher = Agent(role=<span class="str">"Researcher"</span>, tools=tools)</pre>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper[langchain]</div>
+      </div>
+
+      <div class="int-card">
+        <div class="int-header">
+          <h3>LlamaIndex</h3>
+          <span class="int-badge">RAG</span>
+        </div>
+        <pre><span class="kw">from</span> scraper.integrations.llamaindex <span class="kw">import</span> ScrapitReader
+<span class="kw">from</span> llama_index.core <span class="kw">import</span> VectorStoreIndex
 
 reader = ScrapitReader()
-docs = reader.load_data(url=<span class="str">"https://example.com"</span>)
 
-index = VectorStoreIndex.from_documents(docs)
+<span class="cmt"># Parallel URL scraping</span>
+docs = reader.load_data(urls=[
+    <span class="str">"https://site1.com"</span>,
+    <span class="str">"https://site2.com"</span>,
+])
+
+index  = VectorStoreIndex.from_documents(docs)
 engine = index.as_query_engine()
 engine.query(<span class="str">"Summarize the main points."</span>)</pre>
-        </div>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper[llamaindex]</div>
       </div>
 
       <div class="int-card">
-        <h3>Quick API <span class="int-badge">No YAML needed</span></h3>
-        <div class="code-card">
-          <pre><span class="kw">from</span> scraper.integrations <span class="kw">import</span> scrape_url
-
-<span class="cmt"># clean LLM-ready text, no config needed</span>
-text = scrape_url(<span class="str">"https://example.com"</span>)
-
-<span class="cmt"># or run a full directive</span>
-<span class="kw">from</span> scraper.integrations <span class="kw">import</span> scrape_directive
-data = scrape_directive(<span class="str">"wikipedia"</span>)</pre>
+        <div class="int-header">
+          <h3>Quick API</h3>
+          <span class="int-badge green">No YAML needed</span>
         </div>
+        <pre><span class="kw">from</span> scraper.integrations <span class="kw">import</span> (
+    scrape_url,           <span class="cmt"># → clean text</span>
+    scrape_page,          <span class="cmt"># → structured metadata</span>
+    scrape_with_selectors,<span class="cmt"># → CSS-defined fields</span>
+    scrape_many,          <span class="cmt"># → parallel URLs</span>
+)
+
+page = scrape_page(<span class="str">"https://example.com"</span>)
+<span class="cmt"># → {title, description, main_content, links, word_count}</span>
+
+data = scrape_with_selectors(<span class="str">"https://example.com"</span>, {
+    <span class="str">"title"</span>: <span class="str">"h1"</span>,
+    <span class="str">"price"</span>: <span class="str">".price-color"</span>,
+})</pre>
+        <div class="int-install"><span>$</span> pip install scrapit-scraper</div>
       </div>
+
     </div>
   </div>
 </section>
 
-<!-- CONTRIBUTE -->
+<!-- ── CONTRIBUTE ─────────────────────────────────── -->
 <section class="contribute" id="contribute">
   <div class="container">
     <div class="section-label">Contributing</div>
-    <h2>Built in public.<br/>Open to everyone.</h2>
+    <h2>Built in public. Open to everyone.</h2>
     <p class="section-sub">All contributions are welcome — code, directives, docs, or just opening an issue.</p>
 
     <div class="contrib-grid">
       <div class="contrib-card">
-        <h3>🐛 Found a bug?</h3>
-        <p>Open an issue using the bug report template. Include your directive YAML and the error message.</p><br/>
-        <a href="https://github.com/joaobenedetmachado/scrapit/issues/new?template=bug_report.md" target="_blank">Report a bug →</a>
+        <h3>🐛 Bug report</h3>
+        <p>Include your directive YAML and full error traceback.</p>
+        <a href="https://github.com/joaobenedetmachado/scrapit/issues/new?template=bug_report.md" target="_blank">Open a bug report →</a>
       </div>
       <div class="contrib-card">
         <h3>✨ Good first issues</h3>
-        <p>10 issues open right now — new transforms, directives for popular sites (Reddit, IMDb, PyPI), and adding tests.</p><br/>
+        <p>10 issues open — new transforms, directives for Reddit/IMDb/PyPI, and tests.</p>
         <a href="https://github.com/joaobenedetmachado/scrapit/issues?q=label%3A%22good+first+issue%22" target="_blank">View open issues →</a>
       </div>
       <div class="contrib-card">
         <h3>📄 Share a directive</h3>
-        <p>Got a working YAML for a site you scrape? Share it — it helps everyone and is the easiest way to contribute.</p><br/>
+        <p>Got a working YAML for a site? Share it — it's the easiest way to contribute.</p>
         <a href="https://github.com/joaobenedetmachado/scrapit/issues/new?template=new_directive.md" target="_blank">Share a directive →</a>
       </div>
       <div class="contrib-card">
-        <h3>📖 Read the guide</h3>
-        <p>Full setup instructions, conventions, and how to add a transform, storage backend, or new directive.</p><br/>
-        <a href="https://github.com/joaobenedetmachado/scrapit/blob/main/CONTRIBUTING.md" target="_blank">CONTRIBUTING.md →</a>
+        <h3>🔧 New transform</h3>
+        <p>Add a function to <code>transforms/__init__.py</code>, document it, open a PR.</p>
+        <a href="https://github.com/joaobenedetmachado/scrapit/blob/main/CONTRIBUTING.md" target="_blank">Read CONTRIBUTING.md →</a>
       </div>
     </div>
   </div>
 </section>
 
-<!-- FOOTER -->
+<!-- ── FAQ ───────────────────────────────────────── -->
+<section class="faq" id="faq">
+  <div class="container">
+    <div class="section-label">FAQ</div>
+    <h2>Common questions</h2>
+    <br/>
+    <div class="faq-grid">
+      <div class="faq-item">
+        <h3>Do I need to write Python to use Scrapit?</h3>
+        <p>No. For standard scraping you only write YAML. Python is only needed if you want to add custom hooks or a new storage backend.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Does it work on JavaScript-rendered sites?</h3>
+        <p>Yes. Set <code>use: playwright</code> in your directive. Install with <code>pip install scrapit-scraper[playwright]</code> and run <code>playwright install chromium</code>.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How do I give Claude or GPT-4 web access with Scrapit?</h3>
+        <p>Use the MCP server (<code>python -m scraper.integrations.mcp</code>) for Claude Desktop/Cursor, or use <code>ScrapitAnthropicAgent</code> / <code>ScrapitOpenAIAgent</code> in your own code.</p>
+      </div>
+      <div class="faq-item">
+        <h3>What's the difference between <code>scrape_url</code> and <code>scrape_page</code>?</h3>
+        <p><code>scrape_url</code> returns clean plain text. <code>scrape_page</code> returns a structured dict with title, description, links, and word count — more useful for agent context.</p>
+      </div>
+      <div class="faq-item">
+        <h3>Can I scrape multiple pages at once?</h3>
+        <p>Yes, three ways: <code>scrape_many(urls)</code> for parallel URL scraping, <code>paginate:</code> in a directive for sequential pages, or <code>follow:</code> for spider mode.</p>
+      </div>
+      <div class="faq-item">
+        <h3>How does change detection work?</h3>
+        <p>Run with <code>--diff</code>. Scrapit compares the current result against the previous JSON output (ignoring timestamps). If anything changed, it fires a webhook if configured.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────── -->
 <footer>
-  <p>
-    <strong>Scrapit</strong> &nbsp;·&nbsp;
-    <a href="https://github.com/joaobenedetmachado/scrapit" target="_blank">GitHub</a> &nbsp;·&nbsp;
-    <a href="https://github.com/joaobenedetmachado/scrapit/blob/main/LICENSE" target="_blank">MIT License</a> &nbsp;·&nbsp;
+  <div class="footer-links">
+    <a href="https://github.com/joaobenedetmachado/scrapit" target="_blank">GitHub</a>
+    <a href="https://pypi.org/project/scrapit-scraper/" target="_blank">PyPI</a>
+    <a href="https://github.com/joaobenedetmachado/scrapit/blob/main/LICENSE" target="_blank">MIT License</a>
     <a href="https://github.com/joaobenedetmachado/scrapit/blob/main/CONTRIBUTING.md" target="_blank">Contributing</a>
-  </p>
-  <p style="margin-top:.5rem; font-size:.8rem;">Made with ☕ by <a href="https://github.com/joaobenedetmachado" target="_blank">João Benedet Machado</a></p>
+    <a href="https://github.com/joaobenedetmachado/scrapit/issues" target="_blank">Issues</a>
+  </div>
+  <p>Made with ☕ by <a href="https://github.com/joaobenedetmachado" target="_blank">João Benedet Machado</a></p>
 </footer>
+
+<script>
+  function switchTab(name, btn) {
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+</script>
 
 </body>
 </html>
