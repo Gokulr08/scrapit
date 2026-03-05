@@ -111,13 +111,14 @@ python -m scraper.main scrape <directive> [--json|--csv|--sqlite|--mongo] [--pre
 | `--csv` | Append to `output/<name>.csv` |
 | `--sqlite` | Save to `output/scrapit.db` |
 | `--mongo` | Save to MongoDB |
+| `--excel` | Append to `output/<name>.xlsx` |
 | `--preview` | Print result, do not save |
 | `--diff` | Compare with previous JSON output and show changes |
 
 ### `batch` — all directives in a folder
 
 ```bash
-python -m scraper.main batch [folder] [--json|--csv|--sqlite|--mongo] [--preview] [--diff]
+python -m scraper.main batch [folder] [--json|--csv|--sqlite|--mongo|--excel] [--preview] [--diff]
 ```
 
 Default folder: `scraper/directives/`

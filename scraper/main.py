@@ -21,6 +21,7 @@ from scraper.scrapers import grab_elements_by_directive
 from scraper.storage import json_file, mongo
 from scraper.storage import csv_file as csv_storage
 from scraper.storage import sqlite as sqlite_storage
+from scraper.storage import excel as excel_storage
 from scraper.storage.diff import diff, load_previous
 from scraper.notifications import notify
 from scraper.logger import log
@@ -57,6 +58,8 @@ def _save(result: dict | list, name: str, dest: str, *, output_dir: str | None =
             csv_storage.save(item, name, output_dir=output_dir)
         elif dest == "sqlite":
             sqlite_storage.save(item, name, output_dir=output_dir)
+        elif dest == "excel":
+            excel_storage.save(item, name, output_dir=output_dir)
         else:
             # json: save list or single dict
             break
@@ -72,6 +75,9 @@ def _save(result: dict | list, name: str, dest: str, *, output_dir: str | None =
     elif dest == "sqlite":
         base = Path(output_dir) if output_dir else _ROOT / "output"
         print(f"→ saved {len(items)} record(s) in SQLite ({base / 'scrapit.db'})")
+    elif dest == "excel":
+        base = Path(output_dir) if output_dir else _ROOT / "output"
+        print(f"→ appended {len(items)} row(s) to: {base / f'{name}.xlsx'}")
 
 
 # ── Core run ──────────────────────────────────────────────────────────────────
@@ -243,6 +249,8 @@ def _dest(args) -> str:
         return "csv"
     if getattr(args, "sqlite", False):
         return "sqlite"
+    if getattr(args, "excel", False):
+        return "excel"
     return "json"
 
 
@@ -252,6 +260,7 @@ def _add_output_args(p):
     group.add_argument("--mongo", action="store_true", help="Save to MongoDB")
     group.add_argument("--csv", action="store_true", help="Append to output/<name>.csv")
     group.add_argument("--sqlite", action="store_true", help="Save to output/scrapit.db")
+    group.add_argument("--excel", action="store_true", help="Append to output/<name>.xlsx")
     p.add_argument("--output-dir", help="Custom output directory (overrides default 'output/')")
     p.add_argument("--preview", action="store_true", help="Print only, do not save")
     p.add_argument("--diff", action="store_true", help="Diff against previous JSON output")
