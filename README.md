@@ -191,6 +191,14 @@ cookies:                 # bs4: dict  |  playwright: list of {name,value,domain}
   session_id: abc123
 proxy: http://proxy:8080
 
+# Proxy with authentication:
+# proxy: http://user:password@proxy:8080
+# proxy: https://user:password@proxy:8080
+# proxy: socks5://user:password@proxy:1080
+
+# Using environment variable (set in .env):
+# proxy: ${PROXY_URL}
+
 # ── Cache ─────────────────────────────────────────────────────────────────────
 cache:
   ttl: 3600              # seconds (0 = disabled)
