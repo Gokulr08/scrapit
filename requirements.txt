@@ -5,3 +5,4 @@ pika
 pymongo
 python-dotenv
 playwright
+openpyxl
