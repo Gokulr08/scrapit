@@ -1,0 +1,1125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Scrapit — Documentation</title>
+  <meta name="description" content="Full documentation for Scrapit — YAML-driven web scraper framework." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #21262d;
+      --border:  #30363d;
+      --text:    #e6edf3;
+      --muted:   #8b949e;
+      --accent:  #58a6ff;
+      --green:   #3fb950;
+      --orange:  #f78166;
+      --purple:  #bc8cff;
+      --yellow:  #e3b341;
+      --r: 8px;
+      --sidebar: 260px;
+      --nav-h:   56px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    code {
+      font-family: 'JetBrains Mono', monospace; font-size: .82em;
+      background: var(--bg3); padding: .12em .4em; border-radius: 4px;
+      color: var(--orange);
+    }
+    p { color: var(--muted); margin-bottom: .9rem; }
+    p strong { color: var(--text); }
+    ul, ol { padding-left: 1.4rem; color: var(--muted); }
+    li { margin-bottom: .3rem; }
+    li strong { color: var(--text); }
+
+    /* ── TOP NAV ───────────────────────────── */
+    .top-nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: var(--nav-h);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 1.5rem;
+      background: rgba(13,17,23,.92); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-left { display: flex; align-items: center; gap: 1.5rem; }
+    .logo { font-weight: 700; font-size: 1rem; color: var(--text); }
+    .logo span { color: var(--accent); }
+    .nav-pill {
+      font-size: .75rem; font-weight: 600; padding: .2rem .6rem;
+      border-radius: 4px; background: rgba(88,166,255,.1);
+      color: var(--accent); border: 1px solid rgba(88,166,255,.2);
+    }
+    .nav-links { display: flex; gap: 1.25rem; font-size: .85rem; }
+    .nav-links a { color: var(--muted); transition: color .15s; }
+    .nav-links a:hover { color: var(--text); text-decoration: none; }
+
+    /* ── LAYOUT ────────────────────────────── */
+    .layout {
+      display: flex;
+      margin-top: var(--nav-h);
+      min-height: calc(100vh - var(--nav-h));
+    }
+
+    /* ── SIDEBAR ───────────────────────────── */
+    .sidebar {
+      position: fixed;
+      top: var(--nav-h); left: 0; bottom: 0;
+      width: var(--sidebar);
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+      background: var(--bg2);
+      padding: 1.5rem 0;
+    }
+    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .sb-group { margin-bottom: 1.5rem; }
+    .sb-group-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: .09em;
+      text-transform: uppercase; color: var(--muted);
+      padding: 0 1.25rem; margin-bottom: .5rem;
+    }
+    .sb-link {
+      display: block; padding: .35rem 1.25rem;
+      font-size: .85rem; color: var(--muted);
+      transition: color .12s, background .12s;
+      border-left: 2px solid transparent;
+    }
+    .sb-link:hover { color: var(--text); background: rgba(255,255,255,.03); text-decoration: none; }
+    .sb-link.active { color: var(--accent); border-left-color: var(--accent); background: rgba(88,166,255,.06); }
+
+    /* ── CONTENT ───────────────────────────── */
+    .content {
+      margin-left: var(--sidebar);
+      flex: 1;
+      max-width: 860px;
+      padding: 3rem 3.5rem 6rem;
+    }
+    @media (max-width: 900px) {
+      .sidebar { display: none; }
+      .content { margin-left: 0; padding: 2rem 1.5rem 4rem; }
+    }
+
+    /* ── HEADINGS ──────────────────────────── */
+    .doc-section { margin-bottom: 4rem; }
+    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: .5rem; }
+    h2 {
+      font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em;
+      margin-bottom: .75rem; margin-top: 2.5rem;
+      padding-bottom: .5rem; border-bottom: 1px solid var(--border);
+    }
+    h2:first-child { margin-top: 0; }
+    h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; margin-top: 1.75rem; color: var(--text); }
+    h4 { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; margin-top: 1.25rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-size: .75rem; }
+    .section-intro { font-size: 1.05rem; color: var(--muted); margin-bottom: 2rem; max-width: 620px; }
+
+    /* ── CALLOUT ───────────────────────────── */
+    .callout {
+      display: flex; gap: .75rem;
+      padding: .9rem 1.1rem; border-radius: var(--r);
+      border-left: 3px solid var(--accent);
+      background: rgba(88,166,255,.07);
+      font-size: .875rem; color: var(--muted);
+      margin: 1.25rem 0;
+    }
+    .callout.green { border-color: var(--green); background: rgba(63,185,80,.07); }
+    .callout.orange { border-color: var(--orange); background: rgba(247,129,102,.07); }
+    .callout-icon { flex-shrink: 0; font-size: 1rem; }
+    .callout strong { color: var(--text); }
+
+    /* ── CODE BLOCK ────────────────────────── */
+    .code-block {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: var(--r); overflow: hidden; margin: 1rem 0;
+    }
+    .code-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: .5rem 1rem; border-bottom: 1px solid var(--border);
+      background: var(--bg3);
+    }
+    .code-fname { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--muted); }
+    .code-dots { display: flex; gap: .35rem; }
+    .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-r { background: #ff5f57; } .dot-y { background: #ffbd2e; } .dot-g { background: #28c940; }
+    pre {
+      padding: 1.1rem 1.25rem; font-family: 'JetBrains Mono', monospace;
+      font-size: .8rem; line-height: 1.8; overflow-x: auto; tab-size: 2;
+    }
+    .kw  { color: #ff7b72; }
+    .str { color: #a5d6ff; }
+    .val { color: #79c0ff; }
+    .cmt { color: #6e7681; font-style: italic; }
+    .key { color: #7ee787; }
+    .num { color: #f2cc60; }
+    .cmd { color: var(--green); }
+    .prm { color: var(--accent); }
+
+    /* ── TABLES ────────────────────────────── */
+    .table-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin: 1rem 0; }
+    table { width: 100%; border-collapse: collapse; font-size: .855rem; }
+    th {
+      text-align: left; padding: .6rem 1rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--muted); font-weight: 600; font-size: .74rem;
+      text-transform: uppercase; letter-spacing: .07em;
+      background: var(--bg3);
+    }
+    td { padding: .55rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--muted); }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,.02); }
+    td code { background: var(--bg3); }
+    .td-key { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: .8rem; }
+    .td-type { font-family: 'JetBrains Mono', monospace; color: var(--yellow); font-size: .78rem; }
+    .td-req { font-size: .72rem; font-weight: 700; color: var(--orange); }
+    .td-opt { font-size: .72rem; font-weight: 700; color: var(--muted); }
+
+    /* ── PILL ──────────────────────────────── */
+    .pill {
+      display: inline-block; padding: .1rem .45rem; border-radius: 4px;
+      font-size: .7rem; font-weight: 700;
+    }
+    .pill-r { background: rgba(247,129,102,.15); color: var(--orange); }
+    .pill-o { background: rgba(63,185,80,.12); color: var(--green); }
+
+    /* ── SEPARATOR ─────────────────────────── */
+    hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+  </style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<nav class="top-nav">
+  <div class="nav-left">
+    <a href="index.html" class="logo">scrap<span>it</span></a>
+    <span class="nav-pill">Docs</span>
+  </div>
+  <div class="nav-links">
+    <a href="index.html">Home</a>
+    <a href="https://github.com/joaobenedetmachado/scrapit" target="_blank">GitHub</a>
+    <a href="https://pypi.org/project/scrapit-scraper/" target="_blank">PyPI</a>
+    <a href="https://github.com/joaobenedetmachado/scrapit/issues?q=label%3A%22good+first+issue%22" target="_blank">Contribute</a>
+  </div>
+</nav>
+
+<div class="layout">
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sb-group">
+    <div class="sb-group-label">Getting started</div>
+    <a class="sb-link" href="#installation">Installation</a>
+    <a class="sb-link" href="#quickstart">Quick start</a>
+    <a class="sb-link" href="#cli">CLI reference</a>
+    <a class="sb-link" href="#env">Environment (.env)</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Directives</div>
+    <a class="sb-link" href="#directive-structure">Structure</a>
+    <a class="sb-link" href="#scrape">scrape:</a>
+    <a class="sb-link" href="#paginate">paginate:</a>
+    <a class="sb-link" href="#spider">follow: (spider)</a>
+    <a class="sb-link" href="#headers">headers / proxy / cache</a>
+    <a class="sb-link" href="#notify">notify:</a>
+    <a class="sb-link" href="#multi-site">multi-site</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Pipeline</div>
+    <a class="sb-link" href="#transforms">Transforms</a>
+    <a class="sb-link" href="#validation">Validation</a>
+    <a class="sb-link" href="#hooks">Hooks</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Storage</div>
+    <a class="sb-link" href="#storage-json">JSON</a>
+    <a class="sb-link" href="#storage-csv">CSV</a>
+    <a class="sb-link" href="#storage-sqlite">SQLite</a>
+    <a class="sb-link" href="#storage-mongo">MongoDB</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">AI Integrations</div>
+    <a class="sb-link" href="#ai-api">Quick API</a>
+    <a class="sb-link" href="#ai-mcp">MCP Server</a>
+    <a class="sb-link" href="#ai-anthropic">Anthropic</a>
+    <a class="sb-link" href="#ai-openai">OpenAI</a>
+    <a class="sb-link" href="#ai-langchain">LangChain / CrewAI</a>
+    <a class="sb-link" href="#ai-llamaindex">LlamaIndex</a>
+  </div>
+  <div class="sb-group">
+    <div class="sb-group-label">Programmatic</div>
+    <a class="sb-link" href="#python-api">Python API</a>
+    <a class="sb-link" href="#queue">RabbitMQ queue</a>
+  </div>
+</aside>
+
+<!-- CONTENT -->
+<main class="content">
+
+  <!-- ── INSTALLATION ─────────────────── -->
+  <section class="doc-section" id="installation">
+    <h1>Scrapit Documentation</h1>
+    <p class="section-intro">Everything you need to scrape any website with just a YAML file — including AI agent integration, transforms, validation, and storage.</p>
+
+    <h2>Installation</h2>
+
+    <h3>Core (always required)</h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper</pre>
+    </div>
+
+    <h3>With optional extras</h3>
+    <div class="code-block">
+      <pre><span class="cmt"># Playwright backend (JS-rendered sites)</span>
+<span class="cmd">$</span> pip install scrapit-scraper[playwright]
+<span class="cmd">$</span> playwright install chromium
+
+<span class="cmt"># AI integrations</span>
+<span class="cmd">$</span> pip install scrapit-scraper[anthropic]   <span class="cmt"># Claude</span>
+<span class="cmd">$</span> pip install scrapit-scraper[openai]      <span class="cmt"># GPT-4o</span>
+<span class="cmd">$</span> pip install scrapit-scraper[langchain]   <span class="cmt"># LangChain / CrewAI</span>
+<span class="cmd">$</span> pip install scrapit-scraper[llamaindex]  <span class="cmt"># LlamaIndex</span>
+<span class="cmd">$</span> pip install scrapit-scraper[mcp]         <span class="cmt"># MCP server</span>
+
+<span class="cmt"># Storage backends</span>
+<span class="cmd">$</span> pip install scrapit-scraper[mongo]
+<span class="cmd">$</span> pip install scrapit-scraper[excel]
+<span class="cmd">$</span> pip install scrapit-scraper[sheets]
+
+<span class="cmt"># Everything</span>
+<span class="cmd">$</span> pip install scrapit-scraper[all]</pre>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">ℹ️</span>
+      <div>All integration extras are optional. Scrapit's core (YAML scraping, transforms, validation, SQLite) works with no extras installed.</div>
+    </div>
+
+    <h3>From source</h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> git clone https://github.com/joaobenedetmachado/scrapit
+<span class="cmd">$</span> cd scrapit
+<span class="cmd">$</span> python -m venv .venv && source .venv/bin/activate
+<span class="cmd">$</span> pip install -e .[dev]</pre>
+    </div>
+  </section>
+
+  <!-- ── QUICKSTART ────────────────────── -->
+  <section class="doc-section" id="quickstart">
+    <h2>Quick start</h2>
+
+    <h3>1. Create a directive</h3>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        <span class="code-fname">directives/hn.yaml</span>
+      </div>
+      <pre><span class="key">site</span>: <span class="str">https://news.ycombinator.com</span>
+<span class="key">use</span>: <span class="val">beautifulsoup</span>
+
+<span class="key">scrape</span>:
+  <span class="key">titles</span>:
+    - <span class="str">'.titleline > a'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+      <span class="key">all</span>: <span class="val">true</span>
+  <span class="key">links</span>:
+    - <span class="str">'.titleline > a'</span>
+    - <span class="key">attr</span>: <span class="val">href</span>
+      <span class="key">all</span>: <span class="val">true</span></pre>
+    </div>
+
+    <h3>2. Run it</h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> scrapit scrape hn <span class="prm">--json</span>
+<span class="cmt">→ saved: output/hn.json</span>
+
+<span class="cmd">$</span> scrapit scrape hn <span class="prm">--json --diff</span>  <span class="cmt"># detect changes</span>
+<span class="cmd">$</span> scrapit scrape hn <span class="prm">--csv --sqlite</span>  <span class="cmt"># multiple outputs</span>
+<span class="cmd">$</span> scrapit scrape hn <span class="prm">--preview</span>       <span class="cmt"># print, don't save</span></pre>
+    </div>
+
+    <h3>3. Query results</h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> scrapit query <span class="prm">--backend sqlite --directive hn --limit 5</span></pre>
+    </div>
+  </section>
+
+  <!-- ── CLI ──────────────────────────── -->
+  <section class="doc-section" id="cli">
+    <h2>CLI reference</h2>
+
+    <h3><code>scrapit scrape</code></h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">directive</td><td>Directive name (e.g. <code>hn</code>) or path to YAML file. <span class="pill pill-r">required</span></td></tr>
+          <tr><td class="td-key">--json</td><td>Save result as <code>output/&lt;name&gt;.json</code></td></tr>
+          <tr><td class="td-key">--csv</td><td>Append result to <code>output/&lt;name&gt;.csv</code></td></tr>
+          <tr><td class="td-key">--sqlite</td><td>Save to <code>output/scrapit.db</code></td></tr>
+          <tr><td class="td-key">--mongo</td><td>Save to MongoDB (requires <code>MONGO_URI</code> in .env)</td></tr>
+          <tr><td class="td-key">--preview</td><td>Print result, do not save anything</td></tr>
+          <tr><td class="td-key">--diff</td><td>Compare against previous JSON run, fire webhook on change</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><code>scrapit batch</code></h3>
+    <p>Run all directives in a folder. Accepts the same output flags as <code>scrape</code>.</p>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> scrapit batch scraper/directives/ <span class="prm">--json --sqlite</span></pre>
+    </div>
+
+    <h3><code>scrapit list</code></h3>
+    <p>List available directives in the default or a custom directory.</p>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> scrapit list
+<span class="cmd">$</span> scrapit list <span class="prm">--dir /path/to/my/directives</span></pre>
+    </div>
+
+    <h3><code>scrapit query</code></h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Flag</th><th>Default</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">--backend</td><td><code>sqlite</code></td><td><code>sqlite</code> or <code>mongo</code></td></tr>
+          <tr><td class="td-key">--directive</td><td>—</td><td>Filter by directive name</td></tr>
+          <tr><td class="td-key">--url</td><td>—</td><td>Filter by URL fragment</td></tr>
+          <tr><td class="td-key">--limit</td><td><code>20</code></td><td>Max results</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3><code>scrapit cache</code></h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> scrapit cache stats        <span class="cmt"># show cache size and entries</span>
+<span class="cmd">$</span> scrapit cache clear        <span class="cmt"># clear all cached responses</span>
+<span class="cmd">$</span> scrapit cache invalidate <span class="prm">--url https://example.com</span></pre>
+    </div>
+  </section>
+
+  <!-- ── ENV ──────────────────────────── -->
+  <section class="doc-section" id="env">
+    <h2>Environment (.env)</h2>
+    <p>Create a <code>.env</code> file at the project root. All variables are optional.</p>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        <span class="code-fname">.env</span>
+      </div>
+      <pre><span class="cmt"># MongoDB</span>
+MONGO_URI=mongodb://localhost:27017
+MONGO_DB=scrapit
+MONGO_COLLECTION=results
+
+<span class="cmt"># RabbitMQ</span>
+RABBITMQ_HOST=localhost
+RABBITMQ_QUEUE=scrapit
+
+<span class="cmt"># Output directory (default: ./output)</span>
+OUTPUT_DIR=./output</pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- ── DIRECTIVE STRUCTURE ──────────── -->
+  <section class="doc-section" id="directive-structure">
+    <h2>Directive structure</h2>
+    <p>A directive is a YAML file that fully describes a scraping job. Place them anywhere and reference by name or path.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Key</th><th>Type</th><th></th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">site</td><td class="td-type">string</td><td><span class="pill pill-r">required</span></td><td>URL to scrape</td></tr>
+          <tr><td class="td-key">sites</td><td class="td-type">list</td><td><span class="pill pill-o">optional</span></td><td>List of URLs (multi-site mode)</td></tr>
+          <tr><td class="td-key">use</td><td class="td-type">string</td><td><span class="pill pill-r">required</span></td><td><code>beautifulsoup</code> or <code>playwright</code></td></tr>
+          <tr><td class="td-key">scrape</td><td class="td-type">dict</td><td><span class="pill pill-r">required</span></td><td>Field definitions with selectors</td></tr>
+          <tr><td class="td-key">transform</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Transform pipeline per field</td></tr>
+          <tr><td class="td-key">validate</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Validation rules per field</td></tr>
+          <tr><td class="td-key">paginate</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Pagination config</td></tr>
+          <tr><td class="td-key">follow</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Spider / link-following config</td></tr>
+          <tr><td class="td-key">headers</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Custom HTTP headers</td></tr>
+          <tr><td class="td-key">cookies</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Cookies to send with request</td></tr>
+          <tr><td class="td-key">proxy</td><td class="td-type">string</td><td><span class="pill pill-o">optional</span></td><td>Proxy URL (e.g. <code>http://proxy:8080</code>)</td></tr>
+          <tr><td class="td-key">cache</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>HTTP cache config (<code>ttl</code> in seconds)</td></tr>
+          <tr><td class="td-key">retries</td><td class="td-type">int</td><td><span class="pill pill-o">optional</span></td><td>Number of retry attempts on failure (default: 3)</td></tr>
+          <tr><td class="td-key">notify</td><td class="td-type">dict</td><td><span class="pill pill-o">optional</span></td><td>Webhook notification config</td></tr>
+          <tr><td class="td-key">wait_for</td><td class="td-type">string</td><td><span class="pill pill-o">optional</span></td><td>Playwright only: CSS selector to wait for before parsing</td></tr>
+          <tr><td class="td-key">screenshot</td><td class="td-type">bool</td><td><span class="pill pill-o">optional</span></td><td>Playwright only: save full-page screenshot</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── SCRAPE ────────────────────────── -->
+  <section class="doc-section" id="scrape">
+    <h2>scrape:</h2>
+    <p>Defines the fields to extract. Each field is a list: <strong>selector → attr config</strong>.</p>
+
+    <div class="code-block">
+      <pre><span class="key">scrape</span>:
+  <span class="cmt"># Single selector, get text</span>
+  <span class="key">title</span>:
+    - <span class="str">'h1'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+
+  <span class="cmt"># Get an HTML attribute</span>
+  <span class="key">image</span>:
+    - <span class="str">'img.hero'</span>
+    - <span class="key">attr</span>: <span class="val">src</span>
+
+  <span class="cmt"># Return ALL matches as a list</span>
+  <span class="key">all_links</span>:
+    - <span class="str">'a.result'</span>
+    - <span class="key">attr</span>: <span class="val">href</span>
+      <span class="key">all</span>: <span class="val">true</span>
+
+  <span class="cmt"># Fallback selectors — tries each in order</span>
+  <span class="key">price</span>:
+    - [<span class="str">'span.price-new'</span>, <span class="str">'span.price'</span>, <span class="str">'.cost'</span>]
+    - <span class="key">attr</span>: <span class="val">text</span></pre>
+    </div>
+
+    <h3>attr values</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>attr</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">text</td><td>Inner text of the element (default)</td></tr>
+          <tr><td class="td-key">html</td><td>Inner HTML of the element</td></tr>
+          <tr><td class="td-key">href</td><td>The <code>href</code> attribute</td></tr>
+          <tr><td class="td-key">src</td><td>The <code>src</code> attribute</td></tr>
+          <tr><td class="td-key">class</td><td>Full class string (e.g. <code>"star-rating Three"</code>)</td></tr>
+          <tr><td class="td-key">any HTML attr</td><td>Any attribute name works: <code>data-id</code>, <code>aria-label</code>, etc.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── PAGINATE ──────────────────────── -->
+  <section class="doc-section" id="paginate">
+    <h2>paginate:</h2>
+    <p>Automatically follow "next page" links. Scrapit fetches each page and merges results into lists.</p>
+
+    <div class="code-block">
+      <pre><span class="key">paginate</span>:
+  <span class="key">selector</span>: <span class="str">'a.next'</span>     <span class="cmt"># CSS selector for the next-page link</span>
+  <span class="key">attr</span>: <span class="val">href</span>              <span class="cmt"># attribute to extract the URL from</span>
+  <span class="key">max_pages</span>: <span class="num">5</span>           <span class="cmt"># safety limit</span></pre>
+    </div>
+
+    <div class="callout">
+      <span class="callout-icon">ℹ️</span>
+      <div>Pagination is supported by both backends. When paginating, fields with <code>all: true</code> are concatenated across pages.</div>
+    </div>
+  </section>
+
+  <!-- ── SPIDER ────────────────────────── -->
+  <section class="doc-section" id="spider">
+    <h2>follow: (spider mode)</h2>
+    <p>Discover all links on a page and scrape each one. Good for blog indexes, product catalogs, and documentation sites.</p>
+
+    <div class="code-block">
+      <pre><span class="key">site</span>: <span class="str">https://myblog.com/posts</span>
+<span class="key">use</span>: <span class="val">beautifulsoup</span>
+
+<span class="key">follow</span>:
+  <span class="key">selector</span>: <span class="str">'a.post-link'</span>   <span class="cmt"># links to follow</span>
+  <span class="key">attr</span>: <span class="val">href</span>
+  <span class="key">max</span>: <span class="num">100</span>                   <span class="cmt"># max pages to scrape</span>
+  <span class="key">same_domain</span>: <span class="val">true</span>          <span class="cmt"># don't leave the domain</span>
+
+<span class="key">scrape</span>:
+  <span class="key">title</span>:
+    - <span class="str">'h1'</span>
+    - <span class="key">attr</span>: <span class="val">text</span>
+  <span class="key">body</span>:
+    - <span class="str">'article'</span>
+    - <span class="key">attr</span>: <span class="val">text</span></pre>
+    </div>
+
+    <p>Returns a list of dicts, one per page scraped. Each item includes the <code>url</code> field automatically.</p>
+  </section>
+
+  <!-- ── HEADERS / PROXY / CACHE ──────── -->
+  <section class="doc-section" id="headers">
+    <h2>headers / proxy / cache</h2>
+
+    <div class="code-block">
+      <pre><span class="key">site</span>: <span class="str">https://example.com</span>
+<span class="key">use</span>: <span class="val">beautifulsoup</span>
+
+<span class="cmt"># Custom HTTP headers</span>
+<span class="key">headers</span>:
+  <span class="key">Accept-Language</span>: <span class="str">en-US,en;q=0.9</span>
+  <span class="key">Referer</span>: <span class="str">https://google.com</span>
+
+<span class="cmt"># Cookies</span>
+<span class="key">cookies</span>:
+  <span class="key">session_id</span>: <span class="str">abc123</span>
+
+<span class="cmt"># Proxy</span>
+<span class="key">proxy</span>: <span class="str">http://user:pass@proxy:8080</span>
+
+<span class="cmt"># Cache responses for 1 hour</span>
+<span class="key">cache</span>:
+  <span class="key">ttl</span>: <span class="num">3600</span>    <span class="cmt"># seconds. Set 0 to disable.</span>
+
+<span class="cmt"># Retry on failure</span>
+<span class="key">retries</span>: <span class="num">3</span>    <span class="cmt"># exponential backoff</span>
+
+<span class="cmt"># Playwright-only</span>
+<span class="key">wait_for</span>: <span class="str">'#content'</span>   <span class="cmt"># wait for selector before parsing</span>
+<span class="key">screenshot</span>: <span class="val">true</span>        <span class="cmt"># save PNG to output/</span></pre>
+    </div>
+  </section>
+
+  <!-- ── NOTIFY ────────────────────────── -->
+  <section class="doc-section" id="notify">
+    <h2>notify:</h2>
+    <p>Fire a webhook when <code>--diff</code> detects a change. Works with Slack, Discord, or any HTTP endpoint.</p>
+
+    <div class="code-block">
+      <pre><span class="key">notify</span>:
+  <span class="key">webhook</span>: <span class="str">https://hooks.slack.com/services/...</span></pre>
+    </div>
+
+    <p>The webhook receives a POST request with a JSON body containing the changed fields and the full new result.</p>
+  </section>
+
+  <!-- ── MULTI-SITE ────────────────────── -->
+  <section class="doc-section" id="multi-site">
+    <h2>Multi-site directives</h2>
+    <p>Scrape multiple URLs with the same directive by using <code>sites:</code> instead of <code>site:</code>.</p>
+
+    <div class="code-block">
+      <pre><span class="key">sites</span>:
+  - <span class="str">https://books.toscrape.com/catalogue/page-1.html</span>
+  - <span class="str">https://books.toscrape.com/catalogue/page-2.html</span>
+  - <span class="str">https://books.toscrape.com/catalogue/page-3.html</span>
+
+<span class="key">use</span>: <span class="val">beautifulsoup</span>
+
+<span class="key">scrape</span>:
+  <span class="key">titles</span>:
+    - <span class="str">'h3 > a'</span>
+    - <span class="key">attr</span>: <span class="val">title</span>
+      <span class="key">all</span>: <span class="val">true</span></pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- ── TRANSFORMS ────────────────────── -->
+  <section class="doc-section" id="transforms">
+    <h2>Transforms</h2>
+    <p>Transforms run after scraping, per field, in order. Each step receives the output of the previous one.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Transform</th><th>Argument</th><th>Description</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">strip</td><td>—</td><td>Remove leading/trailing whitespace</td><td><code>- strip</code></td></tr>
+          <tr><td class="td-key">lower</td><td>—</td><td>Lowercase</td><td><code>- lower</code></td></tr>
+          <tr><td class="td-key">upper</td><td>—</td><td>Uppercase</td><td><code>- upper</code></td></tr>
+          <tr><td class="td-key">title</td><td>—</td><td>Title case</td><td><code>- title</code></td></tr>
+          <tr><td class="td-key">int</td><td>—</td><td>Parse integer, strips non-numeric chars</td><td><code>- int</code></td></tr>
+          <tr><td class="td-key">float</td><td>—</td><td>Parse float, strips non-numeric chars</td><td><code>- float</code></td></tr>
+          <tr><td class="td-key">regex</td><td><code>pattern</code></td><td>Extract first regex match</td><td><code>{regex: '\d+'}</code></td></tr>
+          <tr><td class="td-key">regex_group</td><td><code>{pattern, group}</code></td><td>Extract a specific capture group</td><td><code>{regex_group: {pattern: '(\w+)', group: 1}}</code></td></tr>
+          <tr><td class="td-key">replace</td><td><code>{old: new, ...}</code></td><td>String substitution (multiple pairs)</td><td><code>{replace: {"£": "", ",": "."}}</code></td></tr>
+          <tr><td class="td-key">split</td><td><code>separator</code></td><td>Split string into list</td><td><code>{split: ","}</code></td></tr>
+          <tr><td class="td-key">join</td><td><code>separator</code></td><td>Join list into string</td><td><code>{join: " | "}</code></td></tr>
+          <tr><td class="td-key">first</td><td>—</td><td>Pick first item from list</td><td><code>- first</code></td></tr>
+          <tr><td class="td-key">last</td><td>—</td><td>Pick last item from list</td><td><code>- last</code></td></tr>
+          <tr><td class="td-key">default</td><td><code>value</code></td><td>Fallback if value is None</td><td><code>{default: "N/A"}</code></td></tr>
+          <tr><td class="td-key">slice</td><td><code>{start, end}</code> or <code>N</code></td><td>Substring or sublist</td><td><code>{slice: {end: 200}}</code></td></tr>
+          <tr><td class="td-key">prepend</td><td><code>string</code></td><td>Add text before value</td><td><code>{prepend: "https://site.com"}</code></td></tr>
+          <tr><td class="td-key">append</td><td><code>string</code></td><td>Add text after value</td><td><code>{append: " USD"}</code></td></tr>
+          <tr><td class="td-key">remove_tags</td><td>—</td><td>Strip HTML tags from string</td><td><code>- remove_tags</code></td></tr>
+          <tr><td class="td-key">template</td><td><code>"prefix {value}"</code></td><td>String template with <code>{value}</code> or <code>{field_name}</code></td><td><code>{template: "Price: {value}"}</code></td></tr>
+          <tr><td class="td-key">slugify</td><td>—</td><td>"Hello World!" → "hello-world"</td><td><code>- slugify</code></td></tr>
+          <tr><td class="td-key">truncate</td><td><code>N</code></td><td>Cut at N chars without breaking words</td><td><code>{truncate: 150}</code></td></tr>
+          <tr><td class="td-key">normalize_whitespace</td><td>—</td><td>Collapse multiple spaces/newlines into one</td><td><code>- normalize_whitespace</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        <span class="code-fname">chained example</span>
+      </div>
+      <pre><span class="key">transform</span>:
+  <span class="key">price</span>:
+    - <span class="val">strip</span>                      <span class="cmt"># "  £ 12,99  " → "£ 12,99"</span>
+    - <span class="key">replace</span>: {<span class="str">"£"</span>: <span class="str">""</span>, <span class="str">","</span>: <span class="str">"."</span>}  <span class="cmt"># → " 12.99"</span>
+    - <span class="val">float</span>                      <span class="cmt"># → 12.99</span>
+
+  <span class="key">slug</span>:
+    - <span class="val">strip</span>
+    - <span class="val">normalize_whitespace</span>
+    - <span class="val">slugify</span>                    <span class="cmt"># "My  Title!" → "my-title"</span>
+
+  <span class="key">summary</span>:
+    - <span class="val">remove_tags</span>                <span class="cmt"># strip HTML</span>
+    - <span class="val">normalize_whitespace</span>
+    - <span class="key">truncate</span>: <span class="num">200</span>             <span class="cmt"># cut at 200 chars</span></pre>
+    </div>
+  </section>
+
+  <!-- ── VALIDATION ────────────────────── -->
+  <section class="doc-section" id="validation">
+    <h2>Validation</h2>
+    <p>Validation runs after transforms. Invalid records are flagged in the output with <code>_valid: false</code> and <code>_errors</code> list. The scrape still completes.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Rule</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">required</td><td class="td-type">bool</td><td>Must not be <code>None</code></td></tr>
+          <tr><td class="td-key">not_empty</td><td class="td-type">bool</td><td>Must not be empty string or list</td></tr>
+          <tr><td class="td-key">type</td><td class="td-type">string</td><td>Type check: <code>str</code>, <code>int</code>, <code>float</code>, <code>list</code>, <code>bool</code></td></tr>
+          <tr><td class="td-key">min / max</td><td class="td-type">number</td><td>Numeric range</td></tr>
+          <tr><td class="td-key">min_length / max_length</td><td class="td-type">int</td><td>String or list length</td></tr>
+          <tr><td class="td-key">pattern</td><td class="td-type">string</td><td>Regex must match</td></tr>
+          <tr><td class="td-key">in</td><td class="td-type">list</td><td>Value must be one of the listed options</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <pre><span class="key">validate</span>:
+  <span class="key">price</span>:
+    <span class="key">required</span>: <span class="val">true</span>
+    <span class="key">type</span>: <span class="val">float</span>
+    <span class="key">min</span>: <span class="num">0</span>
+  <span class="key">title</span>:
+    <span class="key">required</span>: <span class="val">true</span>
+    <span class="key">min_length</span>: <span class="num">2</span>
+    <span class="key">max_length</span>: <span class="num">500</span>
+  <span class="key">status</span>:
+    <span class="key">in</span>: [<span class="val">active</span>, <span class="val">inactive</span>, <span class="val">pending</span>]
+  <span class="key">sku</span>:
+    <span class="key">pattern</span>: <span class="str">'^[A-Z]{2}\d{4}$'</span></pre>
+    </div>
+  </section>
+
+  <!-- ── HOOKS ─────────────────────────── -->
+  <section class="doc-section" id="hooks">
+    <h2>Hooks</h2>
+    <p>Register Python callbacks for scrape lifecycle events without modifying core code.</p>
+
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Event</th><th>Called when</th><th>Arguments</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">before_scrape</td><td>Before fetching the page</td><td><code>(dados)</code></td></tr>
+          <tr><td class="td-key">after_scrape</td><td>After scraping and transforms</td><td><code>(result, dados)</code></td></tr>
+          <tr><td class="td-key">on_error</td><td>On any exception</td><td><code>(exc, dados)</code></td></tr>
+          <tr><td class="td-key">on_save</td><td>After saving to storage</td><td><code>(result, path)</code></td></tr>
+          <tr><td class="td-key">on_change</td><td>When <code>--diff</code> detects a change</td><td><code>(changes, result)</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper <span class="kw">import</span> hooks
+
+<span class="cmt"># Log every scrape result</span>
+<span class="val">@hooks.on</span>(<span class="str">"after_scrape"</span>)
+<span class="kw">def</span> log_result(result, dados):
+    print(f<span class="str">"scraped {result['url']} — {len(result)} fields"</span>)
+
+<span class="cmt"># Send alert on change</span>
+<span class="val">@hooks.on</span>(<span class="str">"on_change"</span>)
+<span class="kw">def</span> alert(changes, result):
+    print(f<span class="str">"changed fields: {list(changes.keys())}"</span>)
+
+<span class="cmt"># Handle errors</span>
+<span class="val">@hooks.on</span>(<span class="str">"on_error"</span>)
+<span class="kw">def</span> handle_error(exc, dados):
+    print(f<span class="str">"failed on {dados['site']}: {exc}"</span>)</pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- ── STORAGE ────────────────────────── -->
+  <section class="doc-section" id="storage-json">
+    <h2>Storage: JSON</h2>
+    <p>Flag: <code>--json</code> &nbsp;·&nbsp; Output: <code>output/&lt;directive&gt;.json</code></p>
+    <p>Saves the latest scrape result. Overwritten on each run. Best for monitoring, APIs, or feeding into other scripts.</p>
+  </section>
+
+  <section class="doc-section" id="storage-csv">
+    <h2>Storage: CSV</h2>
+    <p>Flag: <code>--csv</code> &nbsp;·&nbsp; Output: <code>output/&lt;directive&gt;.csv</code></p>
+    <p>Appends one row per run. The header row is written only on the first run. Best for building time-series datasets.</p>
+  </section>
+
+  <section class="doc-section" id="storage-sqlite">
+    <h2>Storage: SQLite</h2>
+    <p>Flag: <code>--sqlite</code> &nbsp;·&nbsp; Output: <code>output/scrapit.db</code></p>
+    <p>Zero-config. All directives share one database file. Query with <code>scrapit query --backend sqlite</code>.</p>
+    <div class="callout green">
+      <span class="callout-icon">✅</span>
+      <div>SQLite is the recommended default for most use cases. No server required, included in Python's stdlib.</div>
+    </div>
+  </section>
+
+  <section class="doc-section" id="storage-mongo">
+    <h2>Storage: MongoDB</h2>
+    <p>Flag: <code>--mongo</code> &nbsp;·&nbsp; Requires <code>MONGO_URI</code> in <code>.env</code></p>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[mongo]</pre>
+    </div>
+    <div class="code-block">
+      <div class="code-header">
+        <div class="code-dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+        <span class="code-fname">.env</span>
+      </div>
+      <pre>MONGO_URI=mongodb://localhost:27017
+MONGO_DB=scrapit
+MONGO_COLLECTION=results</pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- ── AI: QUICK API ─────────────────── -->
+  <section class="doc-section" id="ai-api">
+    <h2>AI: Quick API</h2>
+    <p>Use Scrapit programmatically without YAML — great for feeding pages into LLMs directly.</p>
+
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations <span class="kw">import</span> (
+    scrape_url,             <span class="cmt"># clean text</span>
+    scrape_page,            <span class="cmt"># structured metadata</span>
+    scrape_with_selectors,  <span class="cmt"># CSS-driven extraction</span>
+    scrape_many,            <span class="cmt"># parallel URLs</span>
+    scrape_directive,       <span class="cmt"># run a YAML directive</span>
+)
+
+<span class="cmt"># Clean readable text — strips nav/scripts/footer</span>
+text = scrape_url(<span class="str">"https://example.com"</span>)
+
+<span class="cmt"># Structured page metadata</span>
+page = scrape_page(<span class="str">"https://example.com"</span>)
+<span class="cmt"># → {url, title, description, main_content, links, word_count}</span>
+
+<span class="cmt"># Agent-defined fields via CSS selectors</span>
+data = scrape_with_selectors(
+    <span class="str">"https://books.toscrape.com/..."</span>,
+    selectors={<span class="str">"title"</span>: <span class="str">"h1"</span>, <span class="str">"price"</span>: <span class="str">"p.price_color"</span>},
+    all_matches={<span class="str">"tags"</span>: <span class="val">True</span>},  <span class="cmt"># return list for 'tags'</span>
+)
+
+<span class="cmt"># Parallel scraping</span>
+pages = scrape_many(
+    [<span class="str">"https://a.com"</span>, <span class="str">"https://b.com"</span>],
+    mode=<span class="str">"page"</span>,     <span class="cmt"># or "text" or "selectors"</span>
+    max_workers=<span class="num">8</span>,
+)</pre>
+    </div>
+  </section>
+
+  <!-- ── AI: MCP ───────────────────────── -->
+  <section class="doc-section" id="ai-mcp">
+    <h2>AI: MCP Server</h2>
+    <p>Run Scrapit as an MCP server so Claude Desktop, Cursor, and Claude Code can call it as a native tool.</p>
+
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[mcp]</pre>
+    </div>
+
+    <h3>Claude Code</h3>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> claude mcp add scrapit -- python -m scraper.integrations.mcp</pre>
+    </div>
+
+    <h3>Claude Desktop</h3>
+    <p>Add to <code>~/Library/Application Support/Claude/claude_desktop_config.json</code>:</p>
+    <div class="code-block">
+      <pre>{
+  <span class="str">"mcpServers"</span>: {
+    <span class="str">"scrapit"</span>: {
+      <span class="str">"command"</span>: <span class="str">"python"</span>,
+      <span class="str">"args"</span>: [<span class="str">"-m"</span>, <span class="str">"scraper.integrations.mcp"</span>],
+      <span class="str">"cwd"</span>: <span class="str">"/path/to/scrapit"</span>
+    }
+  }
+}</pre>
+    </div>
+
+    <h3>Tools exposed</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">scrape_url_tool</td><td>Fetch any URL, return clean text</td></tr>
+          <tr><td class="td-key">scrape_page_tool</td><td>Fetch any URL, return title + description + links + content as JSON</td></tr>
+          <tr><td class="td-key">scrape_with_selectors_tool</td><td>Extract specific fields using CSS selectors</td></tr>
+          <tr><td class="td-key">run_directive_tool</td><td>Run a pre-configured YAML directive by name</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── AI: ANTHROPIC ─────────────────── -->
+  <section class="doc-section" id="ai-anthropic">
+    <h2>AI: Anthropic SDK</h2>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[anthropic]</pre>
+    </div>
+
+    <h3>Built-in agent loop</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations.anthropic <span class="kw">import</span> ScrapitAnthropicAgent
+
+agent = ScrapitAnthropicAgent(
+    model=<span class="str">"claude-opus-4-6"</span>,
+    max_iterations=<span class="num">10</span>,
+    system=<span class="str">"You are a research assistant..."</span>,
+)
+
+answer = agent.run(
+    <span class="str">"What are the top 5 stories on Hacker News right now?"</span>
+)
+print(answer)</pre>
+    </div>
+
+    <h3>Manual tool use</h3>
+    <div class="code-block">
+      <pre><span class="kw">import</span> anthropic
+<span class="kw">from</span> scraper.integrations.anthropic <span class="kw">import</span> as_anthropic_tools, handle_tool_call
+
+client = anthropic.Anthropic()
+tools  = as_anthropic_tools()
+
+response = client.messages.create(
+    model=<span class="str">"claude-opus-4-6"</span>,
+    max_tokens=<span class="num">1024</span>,
+    tools=tools,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"..."</span>}],
+)
+
+<span class="kw">for</span> block <span class="kw">in</span> response.content:
+    <span class="kw">if</span> block.type == <span class="str">"tool_use"</span>:
+        result = handle_tool_call(block.name, block.input)
+        <span class="cmt"># send result back as tool_result message</span></pre>
+    </div>
+  </section>
+
+  <!-- ── AI: OPENAI ────────────────────── -->
+  <section class="doc-section" id="ai-openai">
+    <h2>AI: OpenAI SDK</h2>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[openai]</pre>
+    </div>
+
+    <h3>Built-in agent loop</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations.openai <span class="kw">import</span> ScrapitOpenAIAgent
+
+agent = ScrapitOpenAIAgent(model=<span class="str">"gpt-4o"</span>)
+answer = agent.run(<span class="str">"Summarize the Python Wikipedia page."</span>)
+print(answer)</pre>
+    </div>
+
+    <h3>Manual function calling</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> openai <span class="kw">import</span> OpenAI
+<span class="kw">from</span> scraper.integrations.openai <span class="kw">import</span> as_openai_functions, handle_function_call
+
+client = OpenAI()
+tools  = as_openai_functions()
+
+response = client.chat.completions.create(
+    model=<span class="str">"gpt-4o"</span>, tools=tools,
+    messages=[{<span class="str">"role"</span>: <span class="str">"user"</span>, <span class="str">"content"</span>: <span class="str">"..."</span>}],
+)
+
+<span class="kw">for</span> call <span class="kw">in</span> response.choices[<span class="num">0</span>].message.tool_calls:
+    result = handle_function_call(
+        call.function.name, call.function.arguments
+    )</pre>
+    </div>
+  </section>
+
+  <!-- ── AI: LANGCHAIN ─────────────────── -->
+  <section class="doc-section" id="ai-langchain">
+    <h2>AI: LangChain / CrewAI / LangGraph</h2>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[langchain]</pre>
+    </div>
+
+    <h3>ScrapitToolkit</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations.langchain <span class="kw">import</span> ScrapitToolkit
+
+<span class="cmt"># All tools at once</span>
+tools = ScrapitToolkit().get_tools()
+
+<span class="cmt"># Or with directive tools</span>
+tools = ScrapitToolkit(directives=[<span class="str">"wikipedia"</span>, <span class="str">"hn"</span>]).get_tools()</pre>
+    </div>
+
+    <h3>Available tools</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Tool</th><th>Input</th><th>Returns</th></tr></thead>
+        <tbody>
+          <tr><td class="td-key">ScrapitTool</td><td>URL string</td><td>Clean page text</td></tr>
+          <tr><td class="td-key">ScrapitPageTool</td><td>URL string</td><td>JSON with title, description, links, word_count</td></tr>
+          <tr><td class="td-key">ScrapitSelectorTool</td><td>JSON <code>{"url": "...", "selectors": {...}}</code></td><td>JSON with extracted fields</td></tr>
+          <tr><td class="td-key">ScrapitDirectiveTool</td><td>Directive name</td><td>JSON with scraped data</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>LangChain agent</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> langchain.agents <span class="kw">import</span> initialize_agent, AgentType
+<span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+
+agent = initialize_agent(
+    tools=ScrapitToolkit().get_tools(),
+    llm=ChatOpenAI(model=<span class="str">"gpt-4o"</span>),
+    agent=AgentType.OPENAI_FUNCTIONS,
+)
+agent.run(<span class="str">"What's on the front page of Hacker News?"</span>)</pre>
+    </div>
+
+    <h3>CrewAI</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> crewai <span class="kw">import</span> Agent, Task, Crew
+
+researcher = Agent(
+    role=<span class="str">"Web Researcher"</span>,
+    goal=<span class="str">"Find and summarize information from the web"</span>,
+    tools=ScrapitToolkit().get_tools(),
+    llm=<span class="str">"gpt-4o"</span>,
+)</pre>
+    </div>
+
+    <h3>Document Loader (RAG)</h3>
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations.langchain <span class="kw">import</span> ScrapitLoader
+<span class="kw">from</span> langchain.text_splitter <span class="kw">import</span> RecursiveCharacterTextSplitter
+
+loader = ScrapitLoader(<span class="str">"https://example.com"</span>)
+docs   = loader.load()
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=<span class="num">1000</span>)
+chunks   = splitter.split_documents(docs)</pre>
+    </div>
+  </section>
+
+  <!-- ── AI: LLAMAINDEX ─────────────────── -->
+  <section class="doc-section" id="ai-llamaindex">
+    <h2>AI: LlamaIndex</h2>
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[llamaindex]</pre>
+    </div>
+
+    <div class="code-block">
+      <pre><span class="kw">from</span> scraper.integrations.llamaindex <span class="kw">import</span> ScrapitReader
+<span class="kw">from</span> llama_index.core <span class="kw">import</span> VectorStoreIndex
+
+reader = ScrapitReader()
+
+<span class="cmt"># Single URL</span>
+docs = reader.load_data(url=<span class="str">"https://example.com"</span>)
+
+<span class="cmt"># Multiple URLs (parallel)</span>
+docs = reader.load_data(urls=[<span class="str">"https://a.com"</span>, <span class="str">"https://b.com"</span>])
+
+<span class="cmt"># From a directive</span>
+docs = reader.load_data(directive=<span class="str">"wikipedia"</span>)
+
+<span class="cmt"># RAG index</span>
+index  = VectorStoreIndex.from_documents(docs)
+engine = index.as_query_engine()
+result = engine.query(<span class="str">"What is the main topic?"</span>)</pre>
+    </div>
+  </section>
+
+  <hr/>
+
+  <!-- ── PYTHON API ─────────────────────── -->
+  <section class="doc-section" id="python-api">
+    <h2>Python API</h2>
+    <p>Run directives programmatically from your own Python code.</p>
+
+    <div class="code-block">
+      <pre><span class="kw">import</span> asyncio
+<span class="kw">from</span> scraper.scrapers <span class="kw">import</span> grab_elements_by_directive
+<span class="kw">from</span> scraper.storage <span class="kw">import</span> json_file, sqlite
+
+<span class="cmt"># Run a directive</span>
+result = asyncio.run(
+    grab_elements_by_directive(<span class="str">"scraper/directives/hn.yaml"</span>)
+)
+
+<span class="cmt"># Save to storage</span>
+json_file.save(result, <span class="str">"hn"</span>)
+sqlite.save(result, <span class="str">"hn"</span>)</pre>
+    </div>
+  </section>
+
+  <!-- ── QUEUE ─────────────────────────── -->
+  <section class="doc-section" id="queue">
+    <h2>RabbitMQ queue</h2>
+    <p>Send directives to a background worker queue. Useful for scheduled scraping at scale.</p>
+
+    <div class="code-block">
+      <pre><span class="cmd">$</span> pip install scrapit-scraper[rabbitmq]</pre>
+    </div>
+
+    <div class="code-block">
+      <pre><span class="cmt"># Producer — send a directive to the queue</span>
+<span class="kw">from</span> scraper.queue.producer <span class="kw">import</span> call_producer
+call_producer(<span class="str">"directives/hn.yaml"</span>)
+
+<span class="cmt"># Consumer — start a blocking worker</span>
+<span class="cmd">$</span> python -m scraper.queue.consumer</pre>
+    </div>
+
+    <p>Configure the connection via <code>RABBITMQ_HOST</code> and <code>RABBITMQ_QUEUE</code> in <code>.env</code>. Workers scrape each received directive and save to MongoDB automatically.</p>
+  </section>
+
+</main>
+</div>
+
+<script>
+  // Highlight active sidebar link based on scroll
+  const links = document.querySelectorAll('.sb-link');
+  const sections = document.querySelectorAll('.doc-section');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        links.forEach(l => l.classList.remove('active'));
+        const active = document.querySelector(`.sb-link[href="#${entry.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+
+</body>
+</html>
