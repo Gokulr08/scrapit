@@ -6,194 +6,336 @@
   <title>Scrapit — Documentation</title>
   <meta name="description" content="Full documentation for Scrapit — YAML-driven web scraper framework." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Instrument+Serif:ital@0;1&family=Syne:wght@700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:      #0d1117;
-      --bg2:     #161b22;
-      --bg3:     #21262d;
-      --border:  #30363d;
-      --text:    #e6edf3;
-      --muted:   #8b949e;
-      --accent:  #58a6ff;
-      --green:   #3fb950;
-      --orange:  #f78166;
-      --purple:  #bc8cff;
-      --yellow:  #e3b341;
-      --r: 8px;
-      --sidebar: 260px;
-      --nav-h:   56px;
+      --ink:      #0c0b09;
+      --ink2:     #141210;
+      --ink3:     #1e1c19;
+      --border:   #2a2724;
+      --border2:  #3d3a35;
+      --text:     #f0ede8;
+      --muted:    #7a7570;
+      --dim:      #4a4742;
+      --accent:   #58a6ff;
+      --accent2:  #79c0ff;
+      --green:    #5bb98c;
+      --red:      #e05252;
+      --yellow:   #f2c94c;
+      --mono:     'IBM Plex Mono', monospace;
+      --serif:    'Instrument Serif', Georgia, serif;
+      --sans:     'Syne', sans-serif;
+      --sidebar:  248px;
+      --nav-h:    52px;
     }
 
     html { scroll-behavior: smooth; }
-    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); line-height: 1.7; }
-    a { color: var(--accent); text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    code {
-      font-family: 'JetBrains Mono', monospace; font-size: .82em;
-      background: var(--bg3); padding: .12em .4em; border-radius: 4px;
-      color: var(--orange);
-    }
-    p { color: var(--muted); margin-bottom: .9rem; }
-    p strong { color: var(--text); }
-    ul, ol { padding-left: 1.4rem; color: var(--muted); }
-    li { margin-bottom: .3rem; }
-    li strong { color: var(--text); }
 
-    /* ── TOP NAV ───────────────────────────── */
+    body {
+      font-family: var(--mono);
+      background: var(--ink);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    /* grain */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+      opacity: 0.028;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    a { color: var(--accent); text-decoration: none; }
+    a:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+    code {
+      font-family: var(--mono);
+      font-size: .8em;
+      background: var(--ink3);
+      border: 1px solid var(--border);
+      padding: .1em .4em;
+      border-radius: 3px;
+      color: var(--accent2);
+    }
+
+    p { color: var(--muted); margin-bottom: .85rem; line-height: 1.75; font-size: .875rem; }
+    p strong { color: var(--text); font-weight: 500; }
+    ul, ol { padding-left: 1.35rem; color: var(--muted); font-size: .875rem; }
+    li { margin-bottom: .3rem; }
+    li strong { color: var(--text); font-weight: 500; }
+
+    /* ── TOP NAV ───────────────────────── */
     .top-nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 200;
       height: var(--nav-h);
       display: flex; align-items: center; justify-content: space-between;
       padding: 0 1.5rem;
-      background: rgba(13,17,23,.92); backdrop-filter: blur(12px);
+      background: rgba(12,11,9,.97);
+      backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
     }
-    .nav-left { display: flex; align-items: center; gap: 1.5rem; }
-    .logo { font-weight: 700; font-size: 1rem; color: var(--text); }
-    .logo span { color: var(--accent); }
-    .nav-pill {
-      font-size: .75rem; font-weight: 600; padding: .2rem .6rem;
-      border-radius: 4px; background: rgba(88,166,255,.1);
-      color: var(--accent); border: 1px solid rgba(88,166,255,.2);
+    .nav-left { display: flex; align-items: center; gap: 1.25rem; }
+
+    .logo {
+      font-family: var(--sans);
+      font-weight: 700;
+      font-size: 1.15rem;
+      color: var(--text);
+      letter-spacing: -.03em;
     }
-    .nav-links { display: flex; gap: 1.25rem; font-size: .85rem; }
-    .nav-links a { color: var(--muted); transition: color .15s; }
+    .logo span { color: var(--accent); }
+
+    .nav-pill {
+      font-family: var(--mono);
+      font-size: .68rem;
+      padding: .15rem .5rem;
+      background: rgba(88,166,255,.08);
+      color: var(--accent);
+      border: 1px solid rgba(88,166,255,.2);
+    }
+
+    .nav-links { display: flex; gap: 1.25rem; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted);
+      transition: color .15s;
+    }
     .nav-links a:hover { color: var(--text); text-decoration: none; }
 
-    /* ── LAYOUT ────────────────────────────── */
+    /* ── LAYOUT ────────────────────────── */
     .layout {
       display: flex;
       margin-top: var(--nav-h);
       min-height: calc(100vh - var(--nav-h));
     }
 
-    /* ── SIDEBAR ───────────────────────────── */
+    /* ── SIDEBAR ───────────────────────── */
     .sidebar {
       position: fixed;
       top: var(--nav-h); left: 0; bottom: 0;
       width: var(--sidebar);
       overflow-y: auto;
       border-right: 1px solid var(--border);
-      background: var(--bg2);
-      padding: 1.5rem 0;
+      background: var(--ink2);
+      padding: 1.75rem 0 2rem;
     }
-    .sidebar::-webkit-scrollbar { width: 4px; }
+    .sidebar::-webkit-scrollbar { width: 3px; }
     .sidebar::-webkit-scrollbar-track { background: transparent; }
-    .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+    .sidebar::-webkit-scrollbar-thumb { background: var(--border); }
 
-    .sb-group { margin-bottom: 1.5rem; }
+    .sb-group { margin-bottom: 1.75rem; }
     .sb-group-label {
-      font-size: .7rem; font-weight: 700; letter-spacing: .09em;
-      text-transform: uppercase; color: var(--muted);
-      padding: 0 1.25rem; margin-bottom: .5rem;
+      font-family: var(--mono);
+      font-size: .65rem;
+      font-weight: 500;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--dim);
+      padding: 0 1.25rem;
+      margin-bottom: .5rem;
     }
     .sb-link {
-      display: block; padding: .35rem 1.25rem;
-      font-size: .85rem; color: var(--muted);
-      transition: color .12s, background .12s;
+      display: block;
+      padding: .32rem 1.25rem;
+      font-family: var(--mono);
+      font-size: .78rem;
+      color: var(--muted);
+      transition: color .12s;
       border-left: 2px solid transparent;
     }
-    .sb-link:hover { color: var(--text); background: rgba(255,255,255,.03); text-decoration: none; }
-    .sb-link.active { color: var(--accent); border-left-color: var(--accent); background: rgba(88,166,255,.06); }
+    .sb-link:hover { color: var(--text); text-decoration: none; }
+    .sb-link.active {
+      color: var(--accent);
+      border-left-color: var(--accent);
+      background: rgba(88,166,255,.05);
+    }
 
-    /* ── CONTENT ───────────────────────────── */
+    /* ── CONTENT ───────────────────────── */
     .content {
       margin-left: var(--sidebar);
       flex: 1;
-      max-width: 860px;
-      padding: 3rem 3.5rem 6rem;
+      max-width: 800px;
+      padding: 3rem 3rem 6rem;
     }
     @media (max-width: 900px) {
       .sidebar { display: none; }
       .content { margin-left: 0; padding: 2rem 1.5rem 4rem; }
     }
 
-    /* ── HEADINGS ──────────────────────────── */
-    .doc-section { margin-bottom: 4rem; }
-    h1 { font-size: 2rem; font-weight: 800; letter-spacing: -.03em; margin-bottom: .5rem; }
+    /* ── HEADINGS ──────────────────────── */
+    .doc-section { margin-bottom: 3.5rem; }
+
+    h1 {
+      font-family: var(--serif);
+      font-size: 2.2rem;
+      font-weight: 400;
+      letter-spacing: -.02em;
+      margin-bottom: .4rem;
+      line-height: 1.15;
+    }
+
     h2 {
-      font-size: 1.4rem; font-weight: 700; letter-spacing: -.02em;
-      margin-bottom: .75rem; margin-top: 2.5rem;
-      padding-bottom: .5rem; border-bottom: 1px solid var(--border);
+      font-family: var(--mono);
+      font-size: 1rem;
+      font-weight: 600;
+      letter-spacing: .01em;
+      margin-bottom: .75rem;
+      margin-top: 2.25rem;
+      padding-bottom: .6rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
     }
     h2:first-child { margin-top: 0; }
-    h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; margin-top: 1.75rem; color: var(--text); }
-    h4 { font-size: .9rem; font-weight: 600; margin-bottom: .3rem; margin-top: 1.25rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-size: .75rem; }
-    .section-intro { font-size: 1.05rem; color: var(--muted); margin-bottom: 2rem; max-width: 620px; }
 
-    /* ── CALLOUT ───────────────────────────── */
+    h3 {
+      font-family: var(--mono);
+      font-size: .85rem;
+      font-weight: 500;
+      margin-bottom: .4rem;
+      margin-top: 1.5rem;
+      color: var(--text);
+    }
+
+    h4 {
+      font-family: var(--mono);
+      font-size: .68rem;
+      font-weight: 500;
+      margin-bottom: .3rem;
+      margin-top: 1.1rem;
+      color: var(--dim);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+    }
+
+    .section-intro {
+      font-size: .9rem;
+      color: var(--muted);
+      margin-bottom: 1.75rem;
+      max-width: 540px;
+      line-height: 1.75;
+    }
+
+    /* ── CALLOUT ───────────────────────── */
     .callout {
       display: flex; gap: .75rem;
-      padding: .9rem 1.1rem; border-radius: var(--r);
-      border-left: 3px solid var(--accent);
-      background: rgba(88,166,255,.07);
-      font-size: .875rem; color: var(--muted);
-      margin: 1.25rem 0;
+      padding: .85rem 1rem;
+      border-left: 2px solid var(--accent);
+      background: rgba(88,166,255,.05);
+      font-size: .82rem;
+      color: var(--muted);
+      margin: 1rem 0;
+      line-height: 1.65;
     }
-    .callout.green { border-color: var(--green); background: rgba(63,185,80,.07); }
-    .callout.orange { border-color: var(--orange); background: rgba(247,129,102,.07); }
-    .callout-icon { flex-shrink: 0; font-size: 1rem; }
-    .callout strong { color: var(--text); }
+    .callout.green { border-color: var(--green); background: rgba(91,185,140,.05); }
+    .callout.red   { border-color: var(--red);   background: rgba(224,82,82,.05); }
+    .callout-icon { flex-shrink: 0; }
+    .callout strong { color: var(--text); font-weight: 500; }
 
-    /* ── CODE BLOCK ────────────────────────── */
+    /* ── CODE BLOCK ────────────────────── */
     .code-block {
-      background: var(--bg2); border: 1px solid var(--border);
-      border-radius: var(--r); overflow: hidden; margin: 1rem 0;
+      background: var(--ink);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin: .85rem 0;
+      position: relative;
+    }
+    .code-block::before {
+      content: '';
+      position: absolute; left: 0; top: 0; bottom: 0; width: 2px;
+      background: var(--accent);
     }
     .code-header {
       display: flex; align-items: center; justify-content: space-between;
-      padding: .5rem 1rem; border-bottom: 1px solid var(--border);
-      background: var(--bg3);
-    }
-    .code-fname { font-family: 'JetBrains Mono', monospace; font-size: .75rem; color: var(--muted); }
-    .code-dots { display: flex; gap: .35rem; }
-    .dot { width: 10px; height: 10px; border-radius: 50%; }
-    .dot-r { background: #ff5f57; } .dot-y { background: #ffbd2e; } .dot-g { background: #28c940; }
-    pre {
-      padding: 1.1rem 1.25rem; font-family: 'JetBrains Mono', monospace;
-      font-size: .8rem; line-height: 1.8; overflow-x: auto; tab-size: 2;
-    }
-    .kw  { color: #ff7b72; }
-    .str { color: #a5d6ff; }
-    .val { color: #79c0ff; }
-    .cmt { color: #6e7681; font-style: italic; }
-    .key { color: #7ee787; }
-    .num { color: #f2cc60; }
-    .cmd { color: var(--green); }
-    .prm { color: var(--accent); }
-
-    /* ── TABLES ────────────────────────────── */
-    .table-wrap { border: 1px solid var(--border); border-radius: var(--r); overflow: hidden; margin: 1rem 0; }
-    table { width: 100%; border-collapse: collapse; font-size: .855rem; }
-    th {
-      text-align: left; padding: .6rem 1rem;
+      padding: .45rem .85rem .45rem 1.1rem;
       border-bottom: 1px solid var(--border);
-      color: var(--muted); font-weight: 600; font-size: .74rem;
-      text-transform: uppercase; letter-spacing: .07em;
-      background: var(--bg3);
+      background: var(--ink2);
     }
-    td { padding: .55rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; color: var(--muted); }
+    .code-fname {
+      font-family: var(--mono);
+      font-size: .7rem;
+      color: var(--dim);
+    }
+    .code-dots { display: flex; gap: .35rem; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; }
+    .dot-r { background: #e05252; }
+    .dot-y { background: #e8c84a; }
+    .dot-g { background: #5bb98c; }
+
+    pre {
+      padding: 1rem 1rem 1rem 1.2rem;
+      font-family: var(--mono);
+      font-size: .77rem;
+      line-height: 1.85;
+      overflow-x: auto;
+      tab-size: 2;
+    }
+
+    .kw  { color: #79c0ff; font-style: italic; }
+    .str { color: #b8d9a0; }
+    .val { color: #7ec8e3; }
+    .cmt { color: #4a4742; font-style: italic; }
+    .key { color: #f2c94c; }
+    .num { color: #e8aa6a; }
+    .cmd { color: var(--green); }
+    .prm { color: var(--accent2); }
+
+    /* ── TABLES ────────────────────────── */
+    .table-wrap {
+      border: 1px solid var(--border);
+      overflow: hidden;
+      margin: .85rem 0;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    th {
+      text-align: left;
+      padding: .55rem .9rem;
+      border-bottom: 1px solid var(--border);
+      color: var(--dim);
+      font-weight: 500;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      font-family: var(--mono);
+      background: var(--ink2);
+    }
+    td {
+      padding: .5rem .9rem;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      color: var(--muted);
+      font-size: .8rem;
+    }
     tr:last-child td { border-bottom: none; }
-    tr:hover td { background: rgba(255,255,255,.02); }
-    td code { background: var(--bg3); }
-    .td-key { font-family: 'JetBrains Mono', monospace; color: var(--accent); font-size: .8rem; }
-    .td-type { font-family: 'JetBrains Mono', monospace; color: var(--yellow); font-size: .78rem; }
-    .td-req { font-size: .72rem; font-weight: 700; color: var(--orange); }
-    .td-opt { font-size: .72rem; font-weight: 700; color: var(--muted); }
+    tr:hover td { background: var(--ink2); }
+    td code { background: var(--ink3); }
+    .td-key  { font-family: var(--mono); color: var(--accent2); font-size: .77rem; }
+    .td-type { font-family: var(--mono); color: var(--yellow);  font-size: .75rem; }
+    .td-req  { font-size: .68rem; font-weight: 600; color: var(--red); }
+    .td-opt  { font-size: .68rem; font-weight: 500; color: var(--dim); }
 
-    /* ── PILL ──────────────────────────────── */
+    /* ── PILL ──────────────────────────── */
     .pill {
-      display: inline-block; padding: .1rem .45rem; border-radius: 4px;
-      font-size: .7rem; font-weight: 700;
+      display: inline-block;
+      padding: .08rem .4rem;
+      font-size: .66rem;
+      font-weight: 600;
+      font-family: var(--mono);
     }
-    .pill-r { background: rgba(247,129,102,.15); color: var(--orange); }
-    .pill-o { background: rgba(63,185,80,.12); color: var(--green); }
+    .pill-r { background: rgba(224,82,82,.12);  color: var(--red); }
+    .pill-o { background: rgba(91,185,140,.1);  color: var(--green); }
 
-    /* ── SEPARATOR ─────────────────────────── */
-    hr { border: none; border-top: 1px solid var(--border); margin: 2.5rem 0; }
+    /* ── SEPARATOR ─────────────────────── */
+    hr {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 2.5rem 0;
+    }
   </style>
 </head>
 <body>
@@ -202,7 +344,7 @@
 <nav class="top-nav">
   <div class="nav-left">
     <a href="index.html" class="logo">scrap<span>it</span></a>
-    <span class="nav-pill">Docs</span>
+    <span class="nav-pill">docs</span>
   </div>
   <div class="nav-links">
     <a href="index.html">Home</a>
@@ -300,7 +442,7 @@
     </div>
 
     <div class="callout">
-      <span class="callout-icon">ℹ️</span>
+      <span class="callout-icon">ℹ</span>
       <div>All integration extras are optional. Scrapit's core (YAML scraping, transforms, validation, SQLite) works with no extras installed.</div>
     </div>
 
@@ -520,7 +662,7 @@ OUTPUT_DIR=./output</pre>
     </div>
 
     <div class="callout">
-      <span class="callout-icon">ℹ️</span>
+      <span class="callout-icon">ℹ</span>
       <div>Pagination is supported by both backends. When paginating, fields with <code>all: true</code> are concatenated across pages.</div>
     </div>
   </section>
@@ -774,7 +916,7 @@ OUTPUT_DIR=./output</pre>
     <p>Flag: <code>--sqlite</code> &nbsp;·&nbsp; Output: <code>output/scrapit.db</code></p>
     <p>Zero-config. All directives share one database file. Query with <code>scrapit query --backend sqlite</code>.</p>
     <div class="callout green">
-      <span class="callout-icon">✅</span>
+      <span class="callout-icon">✓</span>
       <div>SQLite is the recommended default for most use cases. No server required, included in Python's stdlib.</div>
     </div>
   </section>
@@ -823,13 +965,13 @@ page = scrape_page(<span class="str">"https://example.com"</span>)
 data = scrape_with_selectors(
     <span class="str">"https://books.toscrape.com/..."</span>,
     selectors={<span class="str">"title"</span>: <span class="str">"h1"</span>, <span class="str">"price"</span>: <span class="str">"p.price_color"</span>},
-    all_matches={<span class="str">"tags"</span>: <span class="val">True</span>},  <span class="cmt"># return list for 'tags'</span>
+    all_matches={<span class="str">"tags"</span>: <span class="val">True</span>},
 )
 
 <span class="cmt"># Parallel scraping</span>
 pages = scrape_many(
     [<span class="str">"https://a.com"</span>, <span class="str">"https://b.com"</span>],
-    mode=<span class="str">"page"</span>,     <span class="cmt"># or "text" or "selectors"</span>
+    mode=<span class="str">"page"</span>,
     max_workers=<span class="num">8</span>,
 )</pre>
     </div>
@@ -917,8 +1059,7 @@ response = client.messages.create(
 
 <span class="kw">for</span> block <span class="kw">in</span> response.content:
     <span class="kw">if</span> block.type == <span class="str">"tool_use"</span>:
-        result = handle_tool_call(block.name, block.input)
-        <span class="cmt"># send result back as tool_result message</span></pre>
+        result = handle_tool_call(block.name, block.input)</pre>
     </div>
   </section>
 
@@ -969,10 +1110,7 @@ response = client.chat.completions.create(
     <div class="code-block">
       <pre><span class="kw">from</span> scraper.integrations.langchain <span class="kw">import</span> ScrapitToolkit
 
-<span class="cmt"># All tools at once</span>
 tools = ScrapitToolkit().get_tools()
-
-<span class="cmt"># Or with directive tools</span>
 tools = ScrapitToolkit(directives=[<span class="str">"wikipedia"</span>, <span class="str">"hn"</span>]).get_tools()</pre>
     </div>
 
@@ -1040,16 +1178,10 @@ chunks   = splitter.split_documents(docs)</pre>
 
 reader = ScrapitReader()
 
-<span class="cmt"># Single URL</span>
 docs = reader.load_data(url=<span class="str">"https://example.com"</span>)
-
-<span class="cmt"># Multiple URLs (parallel)</span>
 docs = reader.load_data(urls=[<span class="str">"https://a.com"</span>, <span class="str">"https://b.com"</span>])
-
-<span class="cmt"># From a directive</span>
 docs = reader.load_data(directive=<span class="str">"wikipedia"</span>)
 
-<span class="cmt"># RAG index</span>
 index  = VectorStoreIndex.from_documents(docs)
 engine = index.as_query_engine()
 result = engine.query(<span class="str">"What is the main topic?"</span>)</pre>
@@ -1068,12 +1200,10 @@ result = engine.query(<span class="str">"What is the main topic?"</span>)</pre>
 <span class="kw">from</span> scraper.scrapers <span class="kw">import</span> grab_elements_by_directive
 <span class="kw">from</span> scraper.storage <span class="kw">import</span> json_file, sqlite
 
-<span class="cmt"># Run a directive</span>
 result = asyncio.run(
     grab_elements_by_directive(<span class="str">"scraper/directives/hn.yaml"</span>)
 )
 
-<span class="cmt"># Save to storage</span>
 json_file.save(result, <span class="str">"hn"</span>)
 sqlite.save(result, <span class="str">"hn"</span>)</pre>
     </div>
@@ -1104,8 +1234,7 @@ call_producer(<span class="str">"directives/hn.yaml"</span>)
 </div>
 
 <script>
-  // Highlight active sidebar link based on scroll
-  const links = document.querySelectorAll('.sb-link');
+  const links    = document.querySelectorAll('.sb-link');
   const sections = document.querySelectorAll('.doc-section');
 
   const observer = new IntersectionObserver((entries) => {
