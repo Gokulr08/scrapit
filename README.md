@@ -286,6 +286,9 @@ notify:
 | `prepend` / `append` | `"str"` | Add text before/after |
 | `remove_tags` | — | Strip HTML tags |
 | `template` | `"prefix {value}"` | String template with `{value}` or `{other_field}` |
+| `slugify` | — | Convert text to a URL-friendly slug (`Hello World` → `hello-world`) |
+| `truncate` | `N` | Truncate to N characters without breaking words, appends `...` |
+| `normalize_whitespace` | — | Collapse multiple spaces/tabs into a single space and strip |
 
 ### Available validation rules
 
