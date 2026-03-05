@@ -388,32 +388,100 @@ Available events: `before_scrape`, `after_scrape`, `on_error`, `on_save`, `on_ch
 
 ## AI Agent Integrations
 
-Scrapit can be used as a tool in any AI agent framework — give an agent the ability to scrape the web on demand.
+Scrapit integrates natively with every major AI agent framework. Give any agent the ability to scrape the web on demand — no boilerplate required.
+
+### MCP Server (Claude Desktop, Cursor, Claude Code)
+
+The fastest way to add Scrapit to Claude:
+
+```bash
+# Claude Code
+claude mcp add scrapit -- python -m scraper.integrations.mcp
+```
+
+For Claude Desktop, add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
+
+```json
+{
+  "mcpServers": {
+    "scrapit": {
+      "command": "python",
+      "args": ["-m", "scraper.integrations.mcp"],
+      "cwd": "/path/to/scrapit"
+    }
+  }
+}
+```
+
+After adding, Claude will have 4 web scraping tools available automatically.
+
+### Anthropic SDK (native tool use)
+
+```python
+import anthropic
+from scraper.integrations.anthropic import as_anthropic_tools, handle_tool_call
+
+client = anthropic.Anthropic()
+tools  = as_anthropic_tools()
+
+response = client.messages.create(
+    model="claude-opus-4-6",
+    max_tokens=1024,
+    tools=tools,
+    messages=[{"role": "user", "content": "What are the top posts on Hacker News?"}],
+)
+
+for block in response.content:
+    if block.type == "tool_use":
+        result = handle_tool_call(block.name, block.input)
+
+# Or use the built-in agent loop:
+from scraper.integrations.anthropic import ScrapitAnthropicAgent
+
+agent = ScrapitAnthropicAgent(model="claude-opus-4-6")
+answer = agent.run("Summarize the top 3 Hacker News posts today.")
+```
 
 ### LangChain / CrewAI / LangGraph
 
 ```python
-from scraper.integrations.langchain import ScrapitTool, ScrapitDirectiveTool
-
-# General tool — agent passes any URL, gets back clean text
-tools = [ScrapitTool()]
-
-# Directive tool — agent runs a pre-defined scrape config
-tools = [ScrapitDirectiveTool(directive="wikipedia")]
-
-# Use with a LangChain agent
+from scraper.integrations.langchain import ScrapitToolkit
 from langchain.agents import initialize_agent, AgentType
 from langchain_openai import ChatOpenAI
+
+tools = ScrapitToolkit().get_tools()
+# → [ScrapitTool, ScrapitPageTool, ScrapitSelectorTool]
 
 agent = initialize_agent(
     tools=tools,
     llm=ChatOpenAI(model="gpt-4o"),
     agent=AgentType.OPENAI_FUNCTIONS,
 )
-agent.run("What does the Wikipedia article on Scarlet Macaw say?")
+agent.run("What does the Wikipedia article on Python say?")
 ```
 
-Works with **CrewAI** out of the box — pass `ScrapitTool()` to any `Agent(tools=[...])`.
+Works with **CrewAI** — pass `ScrapitToolkit().get_tools()` to any `Agent(tools=[...])`.
+
+### OpenAI SDK (function calling)
+
+```python
+from openai import OpenAI
+from scraper.integrations.openai import as_openai_functions, handle_function_call
+
+client = OpenAI()
+tools  = as_openai_functions()
+
+response = client.chat.completions.create(
+    model="gpt-4o", tools=tools,
+    messages=[{"role": "user", "content": "Scrape the top GitHub trending repos."}],
+)
+
+# Or use the built-in agent loop:
+from scraper.integrations.openai import ScrapitOpenAIAgent
+
+agent = ScrapitOpenAIAgent(model="gpt-4o")
+answer = agent.run("What are the trending Python repos on GitHub today?")
+```
 
 ### LlamaIndex (RAG pipelines)
 
@@ -422,45 +490,49 @@ from scraper.integrations.llamaindex import ScrapitReader
 from llama_index.core import VectorStoreIndex
 
 reader = ScrapitReader()
+docs   = reader.load_data(urls=["https://site1.com", "https://site2.com"])  # parallel
 
-# Load from a plain URL
-docs = reader.load_data(url="https://example.com/article")
-
-# Load using a directive (structured data)
-docs = reader.load_data(directive="wikipedia")
-
-# Load multiple URLs at once
-docs = reader.load_data(urls=["https://site1.com", "https://site2.com"])
-
-# Build a RAG index
-index = VectorStoreIndex.from_documents(docs)
-query_engine = index.as_query_engine()
-response = query_engine.query("Summarize the main points.")
+index  = VectorStoreIndex.from_documents(docs)
+engine = index.as_query_engine()
+response = engine.query("Summarize the main points.")
 ```
 
 ### Quick programmatic API (no YAML needed)
 
 ```python
-from scraper.integrations import scrape_url, scrape_directive
+from scraper.integrations import scrape_url, scrape_page, scrape_with_selectors, scrape_many
 
-# Get clean text from any URL — ready to feed into an LLM
+# Clean text — ready to feed to an LLM
 text = scrape_url("https://news.ycombinator.com")
+
+# Structured metadata: title, description, links, word_count
+page = scrape_page("https://example.com")
+
+# Agent-defined extraction with CSS selectors — no YAML needed
+data = scrape_with_selectors(
+    "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000",
+    selectors={"title": "h1", "price": "p.price_color"},
+)
+
+# Parallel scraping
+pages = scrape_many(["https://a.com", "https://b.com"], mode="page")
 
 # Run a directive and get structured data
 data = scrape_directive("wikipedia")
 ```
 
-### Installation
+### Optional dependencies
+
+All integration dependencies are lazy — Scrapit works without any of them installed.
+Install only what you need:
 
 ```bash
-# For LangChain
-pip install langchain-core
-
-# For LlamaIndex
-pip install llama-index-core
+pip install anthropic          # Anthropic SDK integration
+pip install openai             # OpenAI integration
+pip install langchain-core     # LangChain / CrewAI / LangGraph
+pip install llama-index-core   # LlamaIndex
+pip install mcp                # MCP server (Claude Desktop / Cursor / Claude Code)
 ```
-
-Scrapit itself has no hard dependency on either framework — the imports are lazy.
 
 ---
 
