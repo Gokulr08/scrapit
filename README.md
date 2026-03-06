@@ -612,6 +612,11 @@ Quick ways to contribute:
 - **New transform** — add a function to `scraper/transforms/__init__.py` and open a PR
 - **Bug report** — use the bug report issue template
 
+### Contributors
+
+<a href="https://github.com/joaobenedetmachado/scrapit/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=joaobenedetmachado/scrapit" />
+</a>
 
 ---
 
