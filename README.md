@@ -77,6 +77,9 @@ SCRAPIT_WEBHOOK_URL=https://hooks.example.com/...
 ## Quick Start
 
 ```bash
+# create a new directive interactively
+python -m scraper.main init
+
 # scrape Wikipedia, save to JSON
 python -m scraper.main scrape wikipedia --json
 
@@ -96,6 +99,32 @@ python -m scraper.main list
 ---
 
 ## CLI Reference
+
+### `init` — create a new directive interactively
+
+```bash
+python -m scraper.main init
+```
+
+Guides you through a series of prompts and generates a ready-to-edit YAML in `scraper/directives/`:
+
+```
+? Site URL: https://news.ycombinator.com
+? Scraping backend (beautifulsoup/playwright) [beautifulsoup]:
+? Output file name (without .yaml): hackernews
+? Fields to scrape (comma-separated, e.g. titles, links, scores): titles, links, scores
+
+→ Created scraper/directives/hackernews.yaml
+
+Next steps:
+  1. Open scraper/directives/hackernews.yaml and replace each 'FIXME' with a real CSS selector.
+  2. Run: python -m scraper.main scrape hackernews --preview
+  3. Save results: python -m scraper.main scrape hackernews --json
+```
+
+Each field is stubbed with a `FIXME` placeholder — open the file, fill in your CSS selectors, and you're ready to scrape.
+
+---
 
 ### `scrape` — single directive
 
@@ -325,7 +354,7 @@ All outputs go to `output/` at the project root.
 ```
 scrapit/
   scraper/
-    main.py                   CLI entry point (scrape/batch/list/query/cache)
+    main.py                   CLI entry point (init/scrape/batch/list/query/cache)
     config.py                 Environment variables and paths
     logger.py                 Logging → console + output/scraper.log
     hooks.py                  Lifecycle hook registry
