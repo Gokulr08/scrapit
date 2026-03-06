@@ -1,13 +1,26 @@
 from pathlib import Path
-from openpyxl import Workbook, load_workbook
 from scraper.config import OUTPUT_DIR
 
 SHEET_NAME = "data"
+
+
+def _get_openpyxl():
+    try:
+        from openpyxl import Workbook, load_workbook
+        return Workbook, load_workbook
+    except ImportError:
+        raise ImportError(
+            "openpyxl is required for Excel output.\n"
+            "Install with: pip install openpyxl"
+        )
+
 
 def save(data: dict, name: str, *, output_dir: str | None = None) -> str:
     base = Path(output_dir) if output_dir else OUTPUT_DIR
     base.mkdir(parents=True, exist_ok=True)
     out_file = base / f"{name}.xlsx"
+
+    Workbook, load_workbook = _get_openpyxl()
 
     row_values = {k: str(v) for k, v in data.items()}
     keys = list(row_values.keys())

@@ -39,7 +39,7 @@ from __future__ import annotations
 
 import json
 
-from scraper.integrations import scrape_url, scrape_page, scrape_with_selectors, scrape_directive
+from scraper.integrations import scrape_url, scrape_page, scrape_with_selectors, scrape_directive, scrape_many
 
 
 def _get_mcp():
@@ -81,7 +81,7 @@ def create_server():
         return scrape_url(url)
 
     @mcp.tool()
-    def scrape_page_tool(url: str) -> str:
+    def scrape_page_tool(url: str, link_limit: int = 100) -> str:
         """
         Fetch a web page and return structured metadata as JSON.
 
@@ -93,14 +93,20 @@ def create_server():
 
         Args:
             url: The URL to fetch.
+            link_limit: Max number of links to return (default 100, set to 0 for all).
         """
         page = scrape_page(url)
         page["main_content"] = page["main_content"][:4000]
-        page["links"] = page["links"][:30]
+        if link_limit > 0:
+            page["links"] = page["links"][:link_limit]
         return json.dumps(page, indent=2, default=str)
 
     @mcp.tool()
-    def scrape_with_selectors_tool(url: str, selectors: dict[str, str]) -> str:
+    def scrape_with_selectors_tool(
+        url: str,
+        selectors: dict[str, str],
+        all_matches: dict[str, bool] | None = None,
+    ) -> str:
         """
         Scrape specific fields from a web page using CSS selectors.
 
@@ -111,12 +117,42 @@ def create_server():
             url: The URL to scrape.
             selectors: A dict mapping field names to CSS selectors.
                 Example: {"title": "h1", "price": ".price-color", "author": ".byline"}
+            all_matches: Optional dict controlling which fields return all matches as a list.
+                Example: {"items": true} — returns every element matching ".item" as a list.
+                By default only the first match is returned for each field.
 
         Returns:
             JSON with the extracted values for each field.
         """
-        result = scrape_with_selectors(url, selectors)
+        result = scrape_with_selectors(url, selectors, all_matches=all_matches or {})
         return json.dumps(result, indent=2, default=str)
+
+    @mcp.tool()
+    def scrape_many_tool(
+        urls: list[str],
+        mode: str = "text",
+        selectors: dict[str, str] | None = None,
+    ) -> str:
+        """
+        Scrape multiple URLs in parallel and return all results.
+
+        Use this when you need to fetch several pages at once — much faster than
+        calling scrape_url_tool repeatedly.
+
+        Args:
+            urls: List of URLs to scrape (up to ~20 for best performance).
+            mode: What to extract from each page:
+                - "text"      — clean readable text (default)
+                - "page"      — structured metadata (title, links, word_count, …)
+                - "selectors" — specific fields via CSS selectors (requires selectors arg)
+            selectors: Required when mode="selectors". Maps field names to CSS selectors.
+                Example: {"title": "h1", "price": ".price"}
+
+        Returns:
+            JSON array with one result per URL, in the same order as the input list.
+        """
+        results = scrape_many(urls, mode=mode, selectors=selectors or {})
+        return json.dumps(results, indent=2, default=str)
 
     @mcp.tool()
     def run_directive_tool(directive: str) -> str:

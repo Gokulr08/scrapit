@@ -388,6 +388,44 @@ scrape:{scrape_block}
     print(f"  3. Save results: python -m scraper.main scrape {name} --json")
 
 
+def cmd_doctor(_args):
+    print("scrapit doctor — checking environment\n")
+    checks = [
+        ("requests",                  "requests",         True),
+        ("beautifulsoup4",            "bs4",              True),
+        ("pyyaml",                    "yaml",             True),
+        ("python-dotenv",             "dotenv",           True),
+        ("playwright",                "playwright",       False),
+        ("pymongo",                   "pymongo",          False),
+        ("pika",                      "pika",             False),
+        ("openpyxl",                  "openpyxl",         False),
+        ("mcp",                       "mcp",              False),
+        ("anthropic",                 "anthropic",        False),
+        ("openai",                    "openai",           False),
+        ("langchain-core",            "langchain_core",   False),
+        ("llama-index-core",          "llama_index",      False),
+        ("psycopg2-binary",           "psycopg2",         False),
+        ("google-api-python-client",  "googleapiclient",  False),
+    ]
+    all_ok = True
+    for pkg, module, required in checks:
+        try:
+            __import__(module)
+            status = "✓"
+        except ImportError:
+            status = "✗" if required else "–"
+            if required:
+                all_ok = False
+        label = "(required)" if required else "(optional)"
+        print(f"  {status}  {pkg:<30} {label}")
+    print()
+    if all_ok:
+        print("All required dependencies are installed.")
+    else:
+        print("Some required dependencies are missing.")
+        print("Run: pip install -r requirements.txt")
+
+
 def cmd_cache(args):
     from scraper import cache as _cache
     if args.action == "stats":
@@ -486,6 +524,9 @@ def main():
     p_cache.add_argument("action", choices=["stats", "clear", "invalidate"])
     p_cache.add_argument("--url", help="URL to invalidate (for 'invalidate' action)")
 
+    # ── doctor ────────────────────────────────────────────────────────────────
+    sub.add_parser("doctor", help="Check installed dependencies and environment")
+
     args = parser.parse_args()
 
     dispatch = {
@@ -495,6 +536,7 @@ def main():
         "list": cmd_list,
         "query": cmd_query,
         "cache": cmd_cache,
+        "doctor": cmd_doctor,
     }
     dispatch[args.command](args)
 
