@@ -1,17 +1,20 @@
 site: https://en.wikipedia.org/wiki/Python_(programming_language)
 use: beautifulsoup
 
+headers:
+  User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36
+
 scrape:
   title:
     - 'h1#firstHeading'
     - attr: text
 
   summary:
-    - 'div#mw-content-text div.mw-parser-output > p:not(.mw-empty-elt)'
+    - 'div.mw-parser-output p:has(b)'
     - attr: text
-  
+
   sections:
-    - 'h2 .mw-headline'
+    - 'h2'
     - attr: text
       all: true
 
@@ -27,9 +30,11 @@ transform:
   title:
     - strip
     - normalize_whitespace
+  sections:
+    - strip
 
 validate:
   title:
     required: true
   summary:
-    required: true   
+    required: true
