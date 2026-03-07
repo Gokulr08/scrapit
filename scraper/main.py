@@ -486,11 +486,11 @@ def cmd_doctor(_args):
             with sync_playwright() as p:
                 browser_path = p.chromium.executable_path
             if os.path.exists(browser_path):
-                print(f"  ✓  playwright chromium browser        (installed)")
+                print("  ✓  playwright chromium browser        (installed)")
             else:
-                print(f"  ⚠  playwright chromium browser        (not installed — run: playwright install chromium)")
+                print("  ⚠  playwright chromium browser        (not installed — run: playwright install chromium)")
         except Exception:
-            print(f"  –  playwright browser check skipped")
+            print("  –  playwright browser check skipped")
 
     print()
     if all_ok:
